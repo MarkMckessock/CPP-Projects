@@ -1,5 +1,39 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <vector>
+
+class Entity {
+public:
+	Entity();
+	void animate();
+	void addTexture(std::string path,int count);
+	sf::Sprite sprite;
+private:
+	sf::Texture texture;
+	int current_frame = 0;
+	int frames;
+};
+
+Entity::Entity() : sprite(),texture(){}
+
+void Entity::addTexture(std::string path,int count) {
+	texture.loadFromFile(path);
+	frames = count;
+	sprite.setTexture(texture);
+}
+
+void Entity::animate() {
+	current_frame++;
+	//std::cout << current_frame << std::endl;
+	if (current_frame > frames-1)
+		current_frame = 0;
+	sprite.setTextureRect(sf::IntRect(current_frame * 32, 0, 32, 32));
+}
+
+class Player :public Entity{
+public:
+	//Player();
+};
 
 class Game {
 public:
@@ -14,8 +48,7 @@ private:
 
 private:
 	sf::RenderWindow mWindow;
-	sf::Texture mTexture;
-	sf::Sprite mPlayer;
+	Player player;
 
 	bool m_is_moving_up;
 	bool m_is_moving_down;
@@ -25,14 +58,11 @@ private:
 };
 
 Game::Game() : //define constructor
-	mWindow(sf::VideoMode(640, 480), "SFML Application"),
-	mPlayer(),mTexture()
-{
-	if(!mTexture.loadFromFile("../Resources/sprPWalkUnarmed2_strip8.png", sf::IntRect(0, 0, 32, 32)))
-		std::cout << "Texture not found." << std::endl;
-	mPlayer.setTexture(mTexture);
-	mPlayer.setPosition(100.f, 100.f);
-	mPlayer.setScale(4.f, 4.f);
+	mWindow(sf::VideoMode(640, 480), "SFML Application")
+{	
+	player.addTexture("../Resources/sprPWalkUnarmed2_strip8.png", 8);
+	player.sprite.setPosition(100.f, 100.f);
+	player.sprite.setScale(4.f, 4.f);
 }
 
 void Game::run() {
@@ -77,13 +107,13 @@ void Game::update(sf::Time delta_time) {
 		movement.x -= 100.f;
 	if (m_is_moving_right)
 		movement.x += 100.f;
-
-	mPlayer.move(movement*delta_time.asSeconds());
+	player.animate();
+	player.sprite.move(movement*delta_time.asSeconds());
 }
 
 void Game::render() {
 	mWindow.clear();
-	mWindow.draw(mPlayer);
+	mWindow.draw(player.sprite);
 	mWindow.display();
 }
 
