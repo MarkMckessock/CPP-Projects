@@ -1,14 +1,5 @@
-#ifndef PLAYER
-#define PLAYER
 #include "Player.h"
-#endif // !PLAYER
-
-#ifndef IO_STREAM
-#define IO_STREAM
 #include <iostream>
-#endif // !IO_STREAM
-
-
 
 void Player::watch_mouse(sf::Vector2i mouse_pos) {
 	sf::Vector2f pos = getPosition();

@@ -1,6 +1,7 @@
 #include "Entity.h"
+#include "Layer.h"
 
-Entity::Entity() :texture() {
+Entity::Entity() :texture(), current_layer() {
 	setOrigin(16.f, 16.f);
 }
 
@@ -25,6 +26,10 @@ void Entity::reset_animation() {
 }
 
 void Entity::set_layer(Layer layer) {
-	current_layer = layer;
-	layer.add_element()
+	current_layer = &layer;
+	layer.add_element(this);
+}
+
+Layer* Entity::get_layer() {
+	return current_layer;
 }

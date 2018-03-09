@@ -1,22 +1,7 @@
-#ifndef GAME
-#define GAME
 #include "Game.h"
-#endif // !GAME
-#ifndef SFML_GRAPHICS
-#define SFML_GRAPHICS
 #include <SFML\Graphics.hpp>
-#endif // !SFML_GRAPHICS
-#ifndef IO_STREAM
-#define IO_STREAM
-#include<iostream>
-#endif // !IO_STREAM
-#ifndef PLAYER
-#define PLAYER
-#include"Player.h"
-#endif // 
-
-
-
+#include <iostream>
+#include "Player.h"
 
 Game::Game() : //define constructor
 	mWindow(sf::VideoMode(640, 480), "SFML Application")

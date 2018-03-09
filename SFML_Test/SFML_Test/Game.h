@@ -1,11 +1,7 @@
-#ifndef SFML_GRAPHICS
-#define SFML_GRAPHICS
 #include <SFML/Graphics.hpp>
-#endif
-#ifndef PLAYER
-#define PLAYER
 #include "Player.h"
-#endif
+
+#ifndef GAME
 #define GAME
 
 class Game {
@@ -29,3 +25,5 @@ private:
 	bool m_is_moving_right;
 	const sf::Time time_per_frame = sf::seconds(1.f / 60.f);
 };
+
+#endif
