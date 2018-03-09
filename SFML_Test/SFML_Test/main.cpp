@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <iostream>
 
 class Game {
 public:
@@ -13,7 +14,8 @@ private:
 
 private:
 	sf::RenderWindow mWindow;
-	sf::CircleShape mPlayer;
+	sf::Texture mTexture;
+	sf::Sprite mPlayer;
 
 	bool m_is_moving_up;
 	bool m_is_moving_down;
@@ -24,11 +26,13 @@ private:
 
 Game::Game() : //define constructor
 	mWindow(sf::VideoMode(640, 480), "SFML Application"),
-	mPlayer() 
+	mPlayer(),mTexture()
 {
-	mPlayer.setRadius(40.f);
+	if(!mTexture.loadFromFile("../Resources/sprPWalkUnarmed2_strip8.png", sf::IntRect(0, 0, 32, 32)))
+		std::cout << "Texture not found." << std::endl;
+	mPlayer.setTexture(mTexture);
 	mPlayer.setPosition(100.f, 100.f);
-	mPlayer.setFillColor(sf::Color::Cyan);
+	mPlayer.setScale(4.f, 4.f);
 }
 
 void Game::run() {
@@ -66,13 +70,13 @@ void Game::process_events() {
 void Game::update(sf::Time delta_time) {
 	sf::Vector2f movement(0.f, 0.f);
 	if (m_is_moving_down)
-		movement.y += 60.f;
+		movement.y += 100.f;
 	if (m_is_moving_up)
-		movement.y -= 60.f;
+		movement.y -= 100.f;
 	if (m_is_moving_left)
-		movement.x -= 60.f;
+		movement.x -= 100.f;
 	if (m_is_moving_right)
-		movement.x += 60.f;
+		movement.x += 100.f;
 
 	mPlayer.move(movement*delta_time.asSeconds());
 }
