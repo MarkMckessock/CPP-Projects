@@ -7,6 +7,7 @@ public:
 	Entity();
 	void animate();
 	void addTexture(std::string path,int count);
+	void reset_animation();
 	sf::Sprite sprite;
 private:
 	sf::Texture texture;
@@ -14,12 +15,15 @@ private:
 	int frames;
 };
 
-Entity::Entity() : sprite(),texture(){}
+Entity::Entity() : sprite(),texture(){
+	sprite.setOrigin(16.f, 16.f);
+}
 
 void Entity::addTexture(std::string path,int count) {
 	texture.loadFromFile(path);
 	frames = count;
 	sprite.setTexture(texture);
+	reset_animation();
 }
 
 void Entity::animate() {
@@ -30,10 +34,24 @@ void Entity::animate() {
 	sprite.setTextureRect(sf::IntRect(current_frame * 32, 0, 32, 32));
 }
 
+void Entity::reset_animation() {
+	sprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
+	current_frame = 0;
+}
+
 class Player :public Entity{
 public:
 	//Player();
+	void watch_mouse(sf::Vector2i mouse_pos);
 };
+
+void Player::watch_mouse(sf::Vector2i mouse_pos) {
+	sf::Vector2f pos = sprite.getPosition();
+	double pi = 3.1415;
+	double angle = atan2(mouse_pos.y-pos.y,mouse_pos.x-pos.x) * (180/pi);
+	sprite.setRotation(angle);
+	std::cout << "angle: " << angle << std::endl;
+}
 
 class Game {
 public:
@@ -67,7 +85,9 @@ Game::Game() : //define constructor
 
 void Game::run() {
 	sf::Clock clock;//store time
+	sf::Clock animation_timer;
 	sf::Time time_since_last_update = sf::Time::Zero; 
+	sf::Time time_since_last_frame = sf::Time::Zero;
 	while (mWindow.isOpen()) {
 		process_events();
 		time_since_last_update += clock.restart();
@@ -75,6 +95,14 @@ void Game::run() {
 			time_since_last_update -= time_per_frame;
 			process_events();
 			update(time_per_frame);
+		}
+		time_since_last_frame += animation_timer.restart();
+		while (time_since_last_frame > sf::seconds(1.f / 6.f)) {
+			time_since_last_frame -= sf::seconds(1.f / 6.f);
+			if (m_is_moving_down || m_is_moving_up || m_is_moving_left || m_is_moving_right)
+				player.animate();
+			else
+				player.reset_animation();
 		}
 		render();
 	}
@@ -95,6 +123,10 @@ void Game::process_events() {
 			break;
 		}
 	}
+	sf::Vector2i mouse_pos = sf::Mouse::getPosition(mWindow);
+	player.watch_mouse(mouse_pos);
+	std::cout << mouse_pos.x << " " << mouse_pos.y << std::endl;
+	std::cout << "Origin " << player.sprite.getOrigin().x << " " << player.sprite.getOrigin().y << std::endl;
 }
 
 void Game::update(sf::Time delta_time) {
@@ -107,7 +139,6 @@ void Game::update(sf::Time delta_time) {
 		movement.x -= 100.f;
 	if (m_is_moving_right)
 		movement.x += 100.f;
-	player.animate();
 	player.sprite.move(movement*delta_time.asSeconds());
 }
 
