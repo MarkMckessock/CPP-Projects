@@ -22,8 +22,8 @@ Game::Game() : //define constructor
 	mWindow(sf::VideoMode(640, 480), "SFML Application")
 {
 	player.addTexture("../Resources/sprPWalkUnarmed2_strip8.png", 8);
-	player.sprite.setPosition(100.f, 100.f);
-	player.sprite.setScale(4.f, 4.f);
+	player.setPosition(100.f, 100.f);
+	player.setScale(4.f, 4.f);
 }
 
 void Game::run() {
@@ -68,8 +68,6 @@ void Game::process_events() {
 	}
 	sf::Vector2i mouse_pos = sf::Mouse::getPosition(mWindow);
 	player.watch_mouse(mouse_pos);
-	std::cout << mouse_pos.x << " " << mouse_pos.y << std::endl;
-	std::cout << "Origin " << player.sprite.getOrigin().x << " " << player.sprite.getOrigin().y << std::endl;
 }
 
 void Game::update(sf::Time delta_time) {
@@ -82,12 +80,12 @@ void Game::update(sf::Time delta_time) {
 		movement.x -= 100.f;
 	if (m_is_moving_right)
 		movement.x += 100.f;
-	player.sprite.move(movement*delta_time.asSeconds());
+	player.move(movement*delta_time.asSeconds());
 }
 
 void Game::render() {
 	mWindow.clear();
-	mWindow.draw(player.sprite);
+	mWindow.draw(player);
 	mWindow.display();
 }
 

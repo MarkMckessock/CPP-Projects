@@ -10,7 +10,7 @@
 
 
 
-class Player : public Entity {
+class Player : public Entity{
 public:
 	//Player();
 	void watch_mouse(sf::Vector2i mouse_pos);
