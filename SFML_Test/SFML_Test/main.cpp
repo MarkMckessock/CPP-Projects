@@ -9,19 +9,8 @@
 
 
 //Textures should be kept independant of entities to prevent reloading.
-
-//Layers:
-//entity.set_layer(5);
-//void render(){
-//render layer 5,4,3,2,1;
-/*class Layer
-public:
- void render(){
- for (entity in contents)
-	render entity
-private:
-	std::vector<entity>;
-*/
+//Add camera roate effect
+//Add shift ability to move camera
 
 int main() {
 	Game game;

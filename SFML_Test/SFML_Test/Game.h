@@ -1,5 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include "Player.h"
+#include "Layer.h"
+#include "Entity.h"
 
 #ifndef GAME
 #define GAME
@@ -18,6 +20,13 @@ private:
 private:
 	sf::RenderWindow mWindow;
 	Player player;
+	Player legs;
+	Entity map;
+	Layer layer_2;
+	Layer layer_1;
+	Layer background;
+
+	sf::View camera;
 
 	bool m_is_moving_up;
 	bool m_is_moving_down;

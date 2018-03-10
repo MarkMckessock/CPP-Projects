@@ -4,19 +4,39 @@
 #include "Player.h"
 
 Game::Game() : //define constructor
-	mWindow(sf::VideoMode(640, 480), "SFML Application")
+	mWindow(sf::VideoMode().getDesktopMode(), "SFML Application", sf::Style::Fullscreen)
 {
+	mWindow.setVerticalSyncEnabled(true);
 	player.addTexture("../Resources/sprPWalkUnarmed2_strip8.png", 8);
 	player.setPosition(100.f, 100.f);
 	player.setScale(4.f, 4.f);
+	player.set_layer(layer_2);
+	player.set_move_speed(150);
+
+	legs.addTexture("../Resources/sprLegs_strip16.png", 16);
+	legs.setPosition(100.f, 100.f);
+	legs.setScale(4.f, 4.f);
+	legs.set_layer(layer_1);
+
+	map.addTexture("../Resources/screen.png", 1);
+	map.setPosition(-100.f, 0.f);
+	map.set_layer(background);
+	map.setScale(5.f, 5.f);
+
+	camera.setCenter(sf::Vector2f(100.f, 100.f));
+	camera.setSize(sf::Vector2f(1366.f, 768.f));
 }
 
 void Game::run() {
+	int count = 0;
 	sf::Clock clock;//store time
 	sf::Clock animation_timer;
+	sf::Clock fps;
 	sf::Time time_since_last_update = sf::Time::Zero;
 	sf::Time time_since_last_frame = sf::Time::Zero;
+	sf::Time fps_check = sf::Time::Zero;
 	while (mWindow.isOpen()) {
+		count++;
 		process_events();
 		time_since_last_update += clock.restart();
 		while (time_since_last_update > time_per_frame) { //only calls update after time_per_frame has passed
@@ -24,13 +44,24 @@ void Game::run() {
 			process_events();
 			update(time_per_frame);
 		}
+		fps_check += fps.restart();
+		while (fps_check > sf::seconds(1.f)) {
+			fps_check -= sf::seconds(1.f);
+			//std::cout << "FPS: " << count << std::endl;
+			count = 0;
+		}
 		time_since_last_frame += animation_timer.restart();
 		while (time_since_last_frame > sf::seconds(1.f / 6.f)) {
 			time_since_last_frame -= sf::seconds(1.f / 6.f);
-			if (m_is_moving_down || m_is_moving_up || m_is_moving_left || m_is_moving_right)
+			if (m_is_moving_down || m_is_moving_up || m_is_moving_left || m_is_moving_right) {
 				player.animate();
-			else
+				legs.animate();
+			}
+			else {
 				player.reset_animation();
+				legs.reset_animation();
+			}
+
 		}
 		render();
 	}
@@ -51,27 +82,34 @@ void Game::process_events() {
 			break;
 		}
 	}
-	sf::Vector2i mouse_pos = sf::Mouse::getPosition(mWindow);
+	sf::Vector2f mouse_pos = mWindow.mapPixelToCoords(sf::Mouse::getPosition(mWindow));
 	player.watch_mouse(mouse_pos);
+	legs.watch_mouse(mouse_pos);
 }
 
 void Game::update(sf::Time delta_time) {
 	sf::Vector2f movement(0.f, 0.f);
 	if (m_is_moving_down)
-		movement.y += 100.f;
+		movement.y += 1.f;
 	if (m_is_moving_up)
-		movement.y -= 100.f;
+		movement.y -= 1.f;
 	if (m_is_moving_left)
-		movement.x -= 100.f;
+		movement.x -= 1.f;
 	if (m_is_moving_right)
-		movement.x += 100.f;
-	player.move(movement*delta_time.asSeconds());
+		movement.x += 1.f;
+	player.move(player.get_move_speed()*movement*delta_time.asSeconds());
+	legs.move(player.get_move_speed()*movement*delta_time.asSeconds());
+	camera.move(player.get_move_speed()*movement*delta_time.asSeconds());
 }
 
 void Game::render() {
 	mWindow.clear();
-	mWindow.draw(player);
+	background.render(mWindow);
+	layer_1.render(mWindow);
+	layer_2.render(mWindow);
+	mWindow.setView(camera);
 	mWindow.display();
+	
 }
 
 void Game::handle_player_input(sf::Keyboard::Key key, bool is_pressed) {

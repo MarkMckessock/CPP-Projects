@@ -1,13 +1,13 @@
 #include <SFML\Graphics.hpp>
-#include "Entity.h"
+#include "Character.h"
 
 #ifndef PLAYER
 #define PLAYER
 
-class Player : public Entity{
+class Player : public Character{
 public:
 	//Player();
-	void watch_mouse(sf::Vector2i mouse_pos);
+	void watch_mouse(sf::Vector2f mouse_pos);
 };
 
 #endif
