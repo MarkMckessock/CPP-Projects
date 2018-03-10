@@ -22,6 +22,7 @@ private:
 	Player player;
 	Player legs;
 	Entity map;
+	Entity collision_mask;
 	Layer layer_2;
 	Layer layer_1;
 	Layer background;

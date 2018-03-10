@@ -2,6 +2,7 @@
 #include <SFML\Graphics.hpp>
 #include <iostream>
 #include "Player.h"
+#include "Collision.h"
 
 Game::Game() : //define constructor
 	mWindow(sf::VideoMode().getDesktopMode(), "SFML Application", sf::Style::Fullscreen)
@@ -23,6 +24,10 @@ Game::Game() : //define constructor
 	map.set_layer(background);
 	map.setScale(5.f, 5.f);
 
+	collision_mask.addTexture("../Resources/collision map.png", 1);
+	collision_mask.setPosition(-100.f, 0.f);
+	collision_mask.setScale(5.f, 5.f);
+
 	camera.setCenter(sf::Vector2f(100.f, 100.f));
 	camera.setSize(sf::Vector2f(1366.f, 768.f));
 }
@@ -35,21 +40,24 @@ void Game::run() {
 	sf::Time time_since_last_update = sf::Time::Zero;
 	sf::Time time_since_last_frame = sf::Time::Zero;
 	sf::Time fps_check = sf::Time::Zero;
+	sf::Clock timer;
 	while (mWindow.isOpen()) {
 		count++;
-		process_events();
 		time_since_last_update += clock.restart();
 		while (time_since_last_update > time_per_frame) { //only calls update after time_per_frame has passed
 			time_since_last_update -= time_per_frame;
 			process_events();
+			std::cout << "events" << clock.restart().asSeconds() << std::endl;
 			update(time_per_frame);
+			std::cout << "update " << clock.restart().asSeconds() << std::endl;
 		}
 		fps_check += fps.restart();
 		while (fps_check > sf::seconds(1.f)) {
 			fps_check -= sf::seconds(1.f);
-			//std::cout << "FPS: " << count << std::endl;
+			std::cout << "FPS: " << count << std::endl;
 			count = 0;
 		}
+		std::cout << "fps " << clock.restart().asSeconds() << std::endl;
 		time_since_last_frame += animation_timer.restart();
 		while (time_since_last_frame > sf::seconds(1.f / 6.f)) {
 			time_since_last_frame -= sf::seconds(1.f / 6.f);
@@ -63,7 +71,10 @@ void Game::run() {
 			}
 
 		}
+		std::cout << "animate " << clock.restart().asSeconds() << std::endl;
 		render();
+		std::cout << "render " << clock.restart().asSeconds() << std::endl;
+		
 	}
 }
 
@@ -88,6 +99,7 @@ void Game::process_events() {
 }
 
 void Game::update(sf::Time delta_time) {
+	sf::Vector2f start_pos = player.getPosition();
 	sf::Vector2f movement(0.f, 0.f);
 	if (m_is_moving_down)
 		movement.y += 1.f;
@@ -98,8 +110,13 @@ void Game::update(sf::Time delta_time) {
 	if (m_is_moving_right)
 		movement.x += 1.f;
 	player.move(player.get_move_speed()*movement*delta_time.asSeconds());
-	legs.move(player.get_move_speed()*movement*delta_time.asSeconds());
-	camera.move(player.get_move_speed()*movement*delta_time.asSeconds());
+
+	if (Collision::PixelPerfectTest(player, collision_mask))
+		player.setPosition(start_pos);
+	else {
+		legs.move(player.get_move_speed()*movement*delta_time.asSeconds());
+		camera.move(player.get_move_speed()*movement*delta_time.asSeconds());
+	}
 }
 
 void Game::render() {
