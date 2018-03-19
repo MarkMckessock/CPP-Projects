@@ -12,7 +12,7 @@ Game::Game() : //define constructor
 	player.setPosition(100.f, 100.f);
 	player.setScale(4.f, 4.f);
 	player.set_layer(layer_2);
-	player.set_move_speed(150);
+	player.set_move_speed(250);
 
 	legs.addTexture("../Resources/sprLegs_strip16.png", 16);
 	legs.setPosition(100.f, 100.f);
@@ -33,31 +33,18 @@ Game::Game() : //define constructor
 }
 
 void Game::run() {
-	int count = 0;
 	sf::Clock clock;//store time
 	sf::Clock animation_timer;
-	sf::Clock fps;
 	sf::Time time_since_last_update = sf::Time::Zero;
 	sf::Time time_since_last_frame = sf::Time::Zero;
-	sf::Time fps_check = sf::Time::Zero;
 	sf::Clock timer;
 	while (mWindow.isOpen()) {
-		count++;
 		time_since_last_update += clock.restart();
 		while (time_since_last_update > time_per_frame) { //only calls update after time_per_frame has passed
 			time_since_last_update -= time_per_frame;
 			process_events();
-			std::cout << "events" << clock.restart().asSeconds() << std::endl;
 			update(time_per_frame);
-			std::cout << "update " << clock.restart().asSeconds() << std::endl;
 		}
-		fps_check += fps.restart();
-		while (fps_check > sf::seconds(1.f)) {
-			fps_check -= sf::seconds(1.f);
-			std::cout << "FPS: " << count << std::endl;
-			count = 0;
-		}
-		std::cout << "fps " << clock.restart().asSeconds() << std::endl;
 		time_since_last_frame += animation_timer.restart();
 		while (time_since_last_frame > sf::seconds(1.f / 6.f)) {
 			time_since_last_frame -= sf::seconds(1.f / 6.f);
@@ -69,12 +56,8 @@ void Game::run() {
 				player.reset_animation();
 				legs.reset_animation();
 			}
-
 		}
-		std::cout << "animate " << clock.restart().asSeconds() << std::endl;
 		render();
-		std::cout << "render " << clock.restart().asSeconds() << std::endl;
-		
 	}
 }
 
@@ -107,16 +90,16 @@ void Game::update(sf::Time delta_time) {
 		movement.y -= 1.f;
 	if (m_is_moving_left)
 		movement.x -= 1.f;
-	if (m_is_moving_right)
+	if (m_is_moving_right)	
 		movement.x += 1.f;
 	player.move(player.get_move_speed()*movement*delta_time.asSeconds());
 
-	if (Collision::PixelPerfectTest(player, collision_mask))
-		player.setPosition(start_pos);
-	else {
-		legs.move(player.get_move_speed()*movement*delta_time.asSeconds());
-		camera.move(player.get_move_speed()*movement*delta_time.asSeconds());
-	}
+		if (Collision::PixelPerfectTest(player, collision_mask))
+			player.setPosition(start_pos);
+		else {
+			legs.move(player.get_move_speed()*movement*delta_time.asSeconds());
+			camera.move(player.get_move_speed()*movement*delta_time.asSeconds());
+		}
 }
 
 void Game::render() {

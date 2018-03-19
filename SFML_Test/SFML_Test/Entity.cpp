@@ -1,12 +1,12 @@
 #include "Entity.h"
 #include "Layer.h"
+#include "Collision.h"
 
 Entity::Entity() :texture(), current_layer() {
 }
 
 void Entity::addTexture(std::string path, int count) {
-	sf::Texture name;
-	texture.loadFromFile(path);
+	Collision::CreateTextureAndBitmask(texture, path);
 	frames = count;
 	setTexture(texture);
 }
