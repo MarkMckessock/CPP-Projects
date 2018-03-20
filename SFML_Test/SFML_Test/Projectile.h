@@ -1,8 +1,9 @@
 #include <SFML\Graphics.hpp>
+#include "Entity.h"
 
 #ifndef PROJECTILE
 #define	PROJECTILE
-class Projectile : public sf::Sprite {
+class Projectile : public Entity{
 public:
 	Projectile();
 	void move_projectile();

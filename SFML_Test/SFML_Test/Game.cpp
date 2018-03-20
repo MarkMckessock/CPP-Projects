@@ -8,25 +8,25 @@
 Game::Game() : //define constructor
 	mWindow(sf::VideoMode().getDesktopMode(), "SFML Application", sf::Style::Fullscreen)
 {	
-	layers["background"] = new Layer;
-	layers["bullets"] = new Layer;
-	layers["entity_body"] = new Layer;
-	layers["entity_legs"] = new Layer;
+	layers["background"] = Layer();
+	layers["bullets"] = Layer();
+	layers["entity_body"] = Layer();
+	layers["entity_legs"] = Layer();
 	mWindow.setVerticalSyncEnabled(true);
 	player.addTexture("../Resources/sprPWalkUnarmed2_strip8.png", 8);
 	player.setPosition(100.f, 100.f);
 	player.setScale(4.f, 4.f);
-	player.set_layer(*(layers["entity_body"]));
+	player.set_layer(layers["entity_body"]);
 	player.set_move_speed(250);
 
 	legs.addTexture("../Resources/sprLegs_strip16.png", 16);
 	legs.setPosition(100.f, 100.f);
 	legs.setScale(4.f, 4.f);
-	legs.set_layer(*(layers["entity_legs"]));
+	legs.set_layer(layers["entity_legs"]);
 
 	map.addTexture("../Resources/screen.png", 1);
 	map.setPosition(-100.f, 0.f);
-	map.set_layer(*(layers["background"]));
+	map.set_layer(layers["background"]);
 	map.setScale(5.f, 5.f);
 
 	collision_mask.addTexture("../Resources/collision map.png", 1);
@@ -52,6 +52,7 @@ void Game::run() {
 			time_since_last_update -= time_per_frame;
 			process_events(mouse_pos);
 			update(time_per_frame,mouse_pos);
+			handle_projectiles();
 		}
 		time_since_last_frame += animation_timer.restart();
 		while (time_since_last_frame > sf::seconds(1.f / 6.f)) {
@@ -102,9 +103,9 @@ void Game::update(sf::Time delta_time, sf::Vector2f mouse_pos) {
 		movement.x += 1.f;
 	player.move(player.get_move_speed()*movement*delta_time.asSeconds());
 
-	if (m_is_shooting)
-		bullets.push_back(player.shoot(textures["bullet"],mouse_pos,player.getPosition()));
-
+	if (m_is_shooting) {
+		bullets.push_back(player.shoot(textures["bullet"], mouse_pos, player.getPosition(),layers["bullets"]));
+	}
 	if (Collision::PixelPerfectTest(player, collision_mask))
 		player.setPosition(start_pos);
 	else {
@@ -115,10 +116,10 @@ void Game::update(sf::Time delta_time, sf::Vector2f mouse_pos) {
 
 void Game::render() {
 	mWindow.clear();
-	*(layers["background"]).render(mWindow);
-	*(layers["entity_legs"]).render(mWindow);
-	*(layers["entity_body"]).render(mWindow);
-	*(layers["bullets"])->render(mWindow);
+	layers["background"].render(mWindow);
+	layers["entity_legs"].render(mWindow);
+	layers["entity_body"].render(mWindow);
+	layers["bullets"].render(mWindow);
 	mWindow.setView(camera);
 	mWindow.display();
 	

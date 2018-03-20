@@ -28,7 +28,7 @@ private:
 	Player legs;
 	Entity map;
 	Entity collision_mask;
-	std::map<std::string, Layer*> layers;
+	std::map<std::string, Layer> layers;
 	std::map<std::string, sf::Texture> textures;
 
 	sf::View camera;

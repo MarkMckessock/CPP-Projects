@@ -1,5 +1,6 @@
 #include <SFML\Graphics.hpp>
 #include "Projectile.h"
+#include "Layer.h"
 
 #ifndef BULLET
 #define BULLET
