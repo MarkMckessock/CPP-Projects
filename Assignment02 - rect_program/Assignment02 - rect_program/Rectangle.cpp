@@ -30,7 +30,7 @@ void Rectangle::set_top_right() {
 		std::cout << "Enter top,right y coordinate: " << std::endl;
 		std::cin >> top_right.y;
 	} while (top_right.y <= bottom_left.y);
-	system("cls")
+	system("cls");
 }
 
 void Rectangle::set_top_right(Coordinate point) {
@@ -46,7 +46,7 @@ Coordinate Rectangle::get_top_right() {
 }
 
 float Rectangle::get_area() {
-	return top_right.x - bottom_left.x*top_right.y - bottom_left.y;
+	return (top_right.x - bottom_left.x)*(top_right.y - bottom_left.y);
 }
 
 float Rectangle::get_diagonal() {

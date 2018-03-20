@@ -6,11 +6,11 @@
 using namespace std;
 
 void display_rectangles(vector<Rectangle> rects) {
+	system("cls");
 	for (int i = 0; i < rects.size(); i++)
 		cout << "Rectangle " << i + 1 << ": (" << rects[i].get_bottom_left().x << ","
 		<< rects[i].get_bottom_left().y << ")\t(" << rects[i].get_top_right().x
 		<< ", " << rects[i].get_top_right().y << ")" << endl;
-	system("pause");
 }
 
 Rectangle get_union(Rectangle rect_1, Rectangle rect_2) {
@@ -22,28 +22,24 @@ Rectangle get_union(Rectangle rect_1, Rectangle rect_2) {
 	return result;
 }
 
-bool get_intersection(Rectangle rect_1, Rectangle rect_2,Rectangle intersect_rect) {
-	//Determine if there is intersection
-	bool is_intersect = false;
-	//Get bottom,left x
-	if (rect_1.get_bottom_left().x > rect_2.get_bottom_left().x && rect_1.get_bottom_left().x < rect_2.get_top_right().x)
-		//result.bottom_left.x = rect_2.get_bottom_left().x;
+bool get_intersection(Rectangle rect_1, Rectangle rect_2,Rectangle &intersect_rect) {
+	Rectangle result(Coordinate(((rect_1.get_bottom_left().x > rect_2.get_bottom_left().x && rect_1.get_bottom_left().x < rect_2.get_top_right().x) ? rect_1.get_bottom_left().x : rect_2.get_bottom_left().x), 
+		((rect_1.get_bottom_left().y > rect_2.get_bottom_left().y && rect_1.get_bottom_left().y < rect_2.get_top_right().y) ? rect_1.get_bottom_left().y : rect_2.get_bottom_left().y)),
+		Coordinate(((rect_1.get_top_right().x > rect_2.get_bottom_left().x && rect_1.get_top_right().x < rect_2.get_top_right().x) ? rect_1.get_top_right().x : rect_2.get_top_right().x),
+		((rect_1.get_top_right().y > rect_2.get_bottom_left().y && rect_1.get_top_right().y < rect_2.get_top_right().y) ? rect_1.get_top_right().y : rect_2.get_top_right().y)));
+	intersect_rect = result;
+	//determine if general intersection occurs
+	if ((rect_2.get_bottom_left().y >= rect_1.get_bottom_left().y && rect_2.get_bottom_left().y < rect_1.get_top_right().y ||
+		rect_1.get_bottom_left().y > rect_2.get_bottom_left().y && rect_1.get_bottom_left().y < rect_2.get_top_right().y) &&
+		(rect_1.get_bottom_left().x >= rect_2.get_bottom_left().x && rect_1.get_bottom_left().x < rect_2.get_top_right().x ||
+			rect_2.get_bottom_left().x > rect_1.get_bottom_left().x && rect_2.get_bottom_left().x < rect_1.get_top_right().x))
+		return true;
 	else
-		//result.bottom_left.x = rect_1.get_bottom_left().x;
-
-	//Get bottom, left y
-	if(rect_1.get_bottom_left().y > rect_2.get_bottom_left().y && rect_1.get_bottom_left().y < rect_2.get_top_right().y)
-		//result.bottom_left.y = rect_2.get_bottom_left().y;
-	else
-		//result.bottom_left.y = rect_1.get_bottom_left().y;
-	Rectangle result(Coordinate((),()));
-	return is_intersect;
+		return false;
 }
 
 int main() {
 	vector<Rectangle> rects;
-	//Rectangle rect_1;
-	//Rectangle rect_2;
 	rects.push_back(Rectangle());
 	rects.push_back(Rectangle());
 	for (int i = 0; i < rects.size(); i++) {
@@ -65,50 +61,53 @@ int main() {
 		cin >> choice;
 
 		switch (choice) {
-			case 1:
-				display_rectangles(rects);
-				system("pause");
-				break;
-			case 2:
-				display_rectangles(rects);
-				for (int i = 0; i < rects.size(); i++) {
-					cout << "Area of rectangle " << i+1 << "=" << rects[i].get_area() << "units²" << endl;
-				}
-				system("pause");
-				break;
-			case 3:
-				display_rectangles(rects);
-				for (int i = 0; i < rects.size(); i++) {
-					cout << "Perimeter of rectangle " << i + 1 << "=" << rects[i].get_perimeter() << "units" << endl;
-				}
-				system("pause");
-				break;
-			case 4:
-				display_rectangles(rects);
-				for (int i = 0; i < rects.size(); i++) {
-					cout << "Diagonal length of rectangle " << i + 1 << "=" << rects[i].get_diagonal() << "units" << endl;
-				}
-				system("pause");
-				break;
-			case 5:
-				display_rectangles(rects);
-				Rectangle union_rect = get_union(rects[0], rects[1]);
-				cout << "The union rectangle of rectange 1 & 2 is: (" << union_rect.get_bottom_left().x << ", " << union_rect.get_bottom_left().y
-					<< ")\t(" << union_rect.get_top_right().x << ", " << union_rect.get_top_right().y << ")" << endl;
-				system("pause");
-				break;
-			case 6:
-				display_rectangles(rects);
-				Rectangle intersect_rect;
-				if (get_intersection(rects[0], rects[1], intersect_rect))
-					cout << "The union rectangle of rectange 1 & 2 is: (" << intersect_rect.get_bottom_left().x << ", " << intersect_rect.get_bottom_left().y
-					<< ")\t(" << intersect_rect.get_top_right().x << ", " << intersect_rect.get_top_right().y << ")" << endl;
-				else
-					cout << "There is no intersection between rectangles 1 & 2." << endl;
-				system("pause");
-				break;
-			case 7:
-				exit;
+		case 1:
+			display_rectangles(rects);
+			system("pause");
+			break;
+		case 2:
+			display_rectangles(rects);
+			for (int i = 0; i < rects.size(); i++) {
+				cout << "Area of rectangle " << i + 1 << " = " << rects[i].get_area() << " units^2" << endl;
+			}
+			system("pause");
+			break;
+		case 3:
+			display_rectangles(rects);
+			for (int i = 0; i < rects.size(); i++) {
+				cout << "Perimeter of rectangle " << i + 1 << " = " << rects[i].get_perimeter() << " units" << endl;
+			}
+			system("pause");
+			break;
+		case 4:
+			display_rectangles(rects);
+			for (int i = 0; i < rects.size(); i++) {
+				cout << "Diagonal length of rectangle " << i + 1 << "=" << rects[i].get_diagonal() << "units" << endl;
+			}
+			system("pause");
+			break;
+		case 5: {
+			display_rectangles(rects);
+			Rectangle union_rect;
+			union_rect = get_union(rects[0], rects[1]);
+			cout << "The union rectangle of rectange 1 & 2 is: (" << union_rect.get_bottom_left().x << ", " << union_rect.get_bottom_left().y
+				<< ")\t(" << union_rect.get_top_right().x << ", " << union_rect.get_top_right().y << ")" << endl;
+			system("pause");
+			break;
+		}
+		case 6: {
+			display_rectangles(rects);
+			Rectangle intersect_rect;
+			if (get_intersection(rects[0], rects[1], intersect_rect))
+				cout << "The intersection rectange 1 & 2 is: (" << intersect_rect.get_bottom_left().x << ", " << intersect_rect.get_bottom_left().y
+				<< ")\t(" << intersect_rect.get_top_right().x << ", " << intersect_rect.get_top_right().y << ")" << endl;
+			else
+				cout << "There is no intersection between rectangles 1 & 2." << endl;
+			system("pause");
+			break;
+		}
+		case 7:
+			return 0;
 		}
 	}
 }
