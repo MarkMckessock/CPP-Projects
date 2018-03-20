@@ -3,30 +3,37 @@
 #include <iostream>
 #include "Player.h"
 #include "Collision.h"
+#include "Layer.h"
 
 Game::Game() : //define constructor
 	mWindow(sf::VideoMode().getDesktopMode(), "SFML Application", sf::Style::Fullscreen)
-{
+{	
+	layers["background"] = new Layer;
+	layers["bullets"] = new Layer;
+	layers["entity_body"] = new Layer;
+	layers["entity_legs"] = new Layer;
 	mWindow.setVerticalSyncEnabled(true);
 	player.addTexture("../Resources/sprPWalkUnarmed2_strip8.png", 8);
 	player.setPosition(100.f, 100.f);
 	player.setScale(4.f, 4.f);
-	player.set_layer(layer_2);
+	player.set_layer(*(layers["entity_body"]));
 	player.set_move_speed(250);
 
 	legs.addTexture("../Resources/sprLegs_strip16.png", 16);
 	legs.setPosition(100.f, 100.f);
 	legs.setScale(4.f, 4.f);
-	legs.set_layer(layer_1);
+	legs.set_layer(*(layers["entity_legs"]));
 
 	map.addTexture("../Resources/screen.png", 1);
 	map.setPosition(-100.f, 0.f);
-	map.set_layer(background);
+	map.set_layer(*(layers["background"]));
 	map.setScale(5.f, 5.f);
 
 	collision_mask.addTexture("../Resources/collision map.png", 1);
 	collision_mask.setPosition(-100.f, 0.f);
 	collision_mask.setScale(5.f, 5.f);
+
+	Collision::CreateTextureAndBitmask(textures["bullet"], "../Resources/HLM_Bullet.png");
 
 	camera.setCenter(sf::Vector2f(100.f, 100.f));
 	camera.setSize(sf::Vector2f(1366.f, 768.f));
@@ -39,11 +46,12 @@ void Game::run() {
 	sf::Time time_since_last_frame = sf::Time::Zero;
 	sf::Clock timer;
 	while (mWindow.isOpen()) {
+		sf::Vector2f mouse_pos = mWindow.mapPixelToCoords(sf::Mouse::getPosition(mWindow));
 		time_since_last_update += clock.restart();
 		while (time_since_last_update > time_per_frame) { //only calls update after time_per_frame has passed
 			time_since_last_update -= time_per_frame;
-			process_events();
-			update(time_per_frame);
+			process_events(mouse_pos);
+			update(time_per_frame,mouse_pos);
 		}
 		time_since_last_frame += animation_timer.restart();
 		while (time_since_last_frame > sf::seconds(1.f / 6.f)) {
@@ -61,7 +69,7 @@ void Game::run() {
 	}
 }
 
-void Game::process_events() {
+void Game::process_events(sf::Vector2f mouse_pos) {
 	sf::Event event;
 	while (mWindow.pollEvent(event)) {
 		switch (event.type) {
@@ -76,12 +84,12 @@ void Game::process_events() {
 			break;
 		}
 	}
-	sf::Vector2f mouse_pos = mWindow.mapPixelToCoords(sf::Mouse::getPosition(mWindow));
+
 	player.watch_mouse(mouse_pos);
 	legs.watch_mouse(mouse_pos);
 }
 
-void Game::update(sf::Time delta_time) {
+void Game::update(sf::Time delta_time, sf::Vector2f mouse_pos) {
 	sf::Vector2f start_pos = player.getPosition();
 	sf::Vector2f movement(0.f, 0.f);
 	if (m_is_moving_down)
@@ -94,19 +102,23 @@ void Game::update(sf::Time delta_time) {
 		movement.x += 1.f;
 	player.move(player.get_move_speed()*movement*delta_time.asSeconds());
 
-		if (Collision::PixelPerfectTest(player, collision_mask))
-			player.setPosition(start_pos);
-		else {
-			legs.move(player.get_move_speed()*movement*delta_time.asSeconds());
-			camera.move(player.get_move_speed()*movement*delta_time.asSeconds());
-		}
+	if (m_is_shooting)
+		bullets.push_back(player.shoot(textures["bullet"],mouse_pos,player.getPosition()));
+
+	if (Collision::PixelPerfectTest(player, collision_mask))
+		player.setPosition(start_pos);
+	else {
+		legs.move(player.get_move_speed()*movement*delta_time.asSeconds());
+		camera.move(player.get_move_speed()*movement*delta_time.asSeconds());
+	}
 }
 
 void Game::render() {
 	mWindow.clear();
-	background.render(mWindow);
-	layer_1.render(mWindow);
-	layer_2.render(mWindow);
+	*(layers["background"]).render(mWindow);
+	*(layers["entity_legs"]).render(mWindow);
+	*(layers["entity_body"]).render(mWindow);
+	*(layers["bullets"])->render(mWindow);
 	mWindow.setView(camera);
 	mWindow.display();
 	
@@ -121,4 +133,16 @@ void Game::handle_player_input(sf::Keyboard::Key key, bool is_pressed) {
 		m_is_moving_down = is_pressed;
 	else if (key == sf::Keyboard::D)
 		m_is_moving_right = is_pressed;
+	else if (key == sf::Keyboard::Space)
+		m_is_shooting = is_pressed;
+}
+
+void Game::handle_projectiles() {
+	for (int i = 0; i < bullets.size(); i++) {
+		bullets[i].move_projectile();
+		if (Collision::PixelPerfectTest(bullets[i], collision_mask)) {
+			bullets.erase(bullets.begin()+i);
+			i--;
+		}
+	}
 }

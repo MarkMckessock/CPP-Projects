@@ -1,4 +1,6 @@
 #include "Entity.h"
+#include "Bullet.h"
+#include "SFML\Graphics.hpp"
 
 #ifndef CHARACTER
 #define CHARACTER
@@ -10,6 +12,7 @@ public:
 	void animate();
 	float get_move_speed();
 	void set_move_speed(float speed);
+	Bullet shoot(sf::Texture, sf::Vector2f target_pos, sf::Vector2f origin_pos);
 private:
 	int current_frame = 0;
 	float move_speed = 100;
