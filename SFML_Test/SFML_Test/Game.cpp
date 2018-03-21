@@ -12,6 +12,8 @@ Game::Game() : //define constructor
 	layers["bullets"] = Layer();
 	layers["entity_body"] = Layer();
 	layers["entity_legs"] = Layer();
+
+	textures["bullet"] = sf::Texture();
 	mWindow.setVerticalSyncEnabled(true);
 	player.addTexture("../Resources/sprPWalkUnarmed2_strip8.png", 8);
 	player.setPosition(100.f, 100.f);
@@ -33,7 +35,8 @@ Game::Game() : //define constructor
 	collision_mask.setPosition(-100.f, 0.f);
 	collision_mask.setScale(5.f, 5.f);
 
-	Collision::CreateTextureAndBitmask(textures["bullet"], "../Resources/HLM_Bullet.png");
+	//Collision::CreateTextureAndBitmask(textures["bullet"], "../Resources/HLM_bullet.png");
+	textures["bullet"].loadFromFile("../Resources/HLM_bullet.png");
 
 	camera.setCenter(sf::Vector2f(100.f, 100.f));
 	camera.setSize(sf::Vector2f(1366.f, 768.f));
