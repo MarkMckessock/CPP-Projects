@@ -9,7 +9,7 @@ public:
 	Fraction(std::string);
 private:
 	int num;
-	int div;
+	int den;
 };
 
 #endif

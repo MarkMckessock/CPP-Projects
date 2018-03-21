@@ -5,7 +5,7 @@
 #ifndef SPLIT
 #define SPLIT
 
-std::vector<std::string> split(std::string& s, char delimiter){
+bool split (std::string& s, char delimiter, std::vector<std::string> &split_target){
 	std::vector<std::string> splits;
 	std::string split = "";
 	int i = 0;
@@ -18,7 +18,11 @@ std::vector<std::string> split(std::string& s, char delimiter){
 		split = "";
 		i++;
 	}
-	return splits;
+	split_target = splits;
+	if (splits.size() > 0)
+		return true;
+	else
+		return false;
 }
 
 #endif

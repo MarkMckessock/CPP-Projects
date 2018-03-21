@@ -15,14 +15,16 @@ void Expression::read() {
 
 void Expression::parse() {
 	//split string by spaces
-	std::vector<std::string> splits = split(expr_string, ' ');
-	//convert operands to fraction types & strip brackets
-	//check for double negatives
-	for (int i = 0; i < splits.size(); i++)
-		if (splits[i].size() > 1)
-			operands.push_back(Fraction(splits[i]));
-		else
-			operators.push_back(splits[i]);
-	std::cout << std::endl;
-	system("pause");
+	std::vector<std::string> splits;
+	if (split(expr_string, ' ', splits)) {
+		//convert operands to fraction types & strip brackets
+		//check for double negatives
+		for (int i = 0; i < splits.size(); i++)
+			if (splits[i].size() > 1)
+				operands.push_back(Fraction(splits[i]));
+			else
+				operators.push_back(splits[i]);
+		std::cout << std::endl;
+		system("pause");
+	}
 }

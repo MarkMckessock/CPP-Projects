@@ -123,6 +123,7 @@
     <ClInclude Include="Expression.h" />
     <ClInclude Include="Fraction.h" />
     <ClInclude Include="split.h" />
+    <ClInclude Include="strip.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
