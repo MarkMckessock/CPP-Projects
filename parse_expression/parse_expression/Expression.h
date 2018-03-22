@@ -10,6 +10,8 @@ public:
 	Expression();
 	void read();
 	void parse();
+	void print();
+	bool validate();
 private:	
 	std::vector<Fraction> operands;
 	std::vector<std::string> operators;

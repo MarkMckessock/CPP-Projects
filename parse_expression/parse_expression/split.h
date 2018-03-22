@@ -5,21 +5,26 @@
 #ifndef SPLIT
 #define SPLIT
 
-bool split (std::string& s, char delimiter, std::vector<std::string> &split_target){
+inline bool split (std::string& s, char delimiter, std::vector<std::string> &split_target){
 	std::vector<std::string> splits;
 	std::string split = "";
 	int i = 0;
+	bool empty_split;
 	while (i < s.size()) {
 		while (s[i] != delimiter && i < s.size()) {
+			empty_split = false;
 			split += s[i];
 			i++;
 		}
-		splits.push_back(split);
-		split = "";
+		if (!empty_split) {
+			splits.push_back(split);
+			split = "";
+			empty_split = true;
+		}
 		i++;
 	}
 	split_target = splits;
-	if (splits.size() > 0)
+	if (splits.size() > 1)
 		return true;
 	else
 		return false;

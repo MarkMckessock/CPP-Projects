@@ -122,6 +122,7 @@
   <ItemGroup>
     <ClInclude Include="Expression.h" />
     <ClInclude Include="Fraction.h" />
+    <ClInclude Include="is_operator.h" />
     <ClInclude Include="split.h" />
     <ClInclude Include="strip.h" />
   </ItemGroup>
