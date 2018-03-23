@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <stdexcept>
 
 Expression::Expression(){}
 
@@ -20,7 +21,7 @@ void Expression::parse() {
 	if (split(expr_string, ' ', splits)) {
 		//convert operands to fraction types & strip brackets
 		//check for double negatives
-		for (int i = 0; i < splits.size(); i++){
+		for (int i = 0; i < splits.size(); i++) {
 			if (splits[i][0] == '*' || splits[i][0] == '+' || splits[i][0] == '/' || (splits[i][0] == '-' && splits[i].size() == 1))
 				operators.push_back(splits[i]);
 			else
@@ -28,6 +29,11 @@ void Expression::parse() {
 				operands.push_back(Fraction(splits[i]));
 		}
 	}
+	else
+		throw std::domain_error("No Spaces found in expression");
+
+	if (!validate())
+		throw std::domain_error("Invalid Expression");
 }
 
 void Expression::print() {
@@ -63,7 +69,11 @@ bool Expression::validate() {
 		//two operators next to eachother
 		if (is_operator(expr_string[i]) && is_operator(expr_string[i + 1]))
 			return false;
-		
+		//' ' before '/' but char after
+		if (expr_string[i] == '/' && expr_string[i + 1] == ' ' && expr_string[i - 1] != ' ')
+			return false;
+		if (expr_string[i] == '/' && expr_string[i + 1] != ' ' && expr_string[i - 1] == ' ')
+			return false;
 		//check for letters
 		if (expr_string[i] < '0' && expr_string[i] > '9' && !is_operator(expr_string[i]) && expr_string[i] != ' ' && expr_string[i] != ')' && expr_string[i] != '(')
 			return false;

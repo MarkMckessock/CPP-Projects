@@ -7,12 +7,14 @@ using namespace std;
 int main() {
 	Expression expression;
 	expression.read();
-	if (!expression.validate()) {
-		cout << "Invalid expression." << endl;
+	try {
+		expression.parse();
+	}
+	catch (std::domain_error& e) {
+		cout << e.what() << endl;
 		system("pause");
 		exit(EXIT_FAILURE);
 	}
-	expression.parse();
 	expression.print();
 	system("pause");
 }
