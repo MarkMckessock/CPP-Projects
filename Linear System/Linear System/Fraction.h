@@ -1,4 +1,5 @@
 #include <string>
+#include <cinttypes>
 
 #ifndef FRACTION
 #define FRACTION
@@ -14,8 +15,8 @@ public:
 	Fraction operator-(const Fraction&);
 	std::string get_string();
 	Fraction simplify();
-	int num;
-	int den;
+	int64_t num;
+	int64_t den;
 };
 
 #endif
