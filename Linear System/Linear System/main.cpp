@@ -3,7 +3,6 @@
 #include <iostream>
 #include "System.h"
 #include "sysfunc.h"
-#include <cinttypes>
 using namespace std;
 //possible errors:
 //differnt variables in 2 systems.

@@ -2,6 +2,9 @@
 #include <string>
 #include <iostream>
 #include "Equation.h"
+#include "boost\rational.hpp"
+#include "boost\exception\all.hpp"
+#include "rational_to_string.h"
 
 System::System(){}
 
@@ -13,6 +16,9 @@ System::System(std::string _eqn_1, std::string _eqn_2){
 	catch (std::invalid_argument& e) {
 		throw;
 	}
+	catch (std::domain_error) {
+		throw;
+	}
 }
 
 std::string System::get_string() {
@@ -20,43 +26,36 @@ std::string System::get_string() {
 }
 
 std::string System::solve() {
-	//solve for var 1 in first equation
-	Equation solve_x;
-	if (eqn_1.get_op() == '+') {
-		//implement operator into fraction valueDO THIS
-		solve_x = Equation(eqn_1.get_rs() / eqn_1.get_ls_const()[0], '+', (eqn_1.get_ls_const()[1] / eqn_1.get_ls_const()[0])*-1,eqn_1.get_ls_var());
-	}
-	else
-		solve_x = Equation(eqn_1.get_rs() / eqn_1.get_ls_const()[0], '+', eqn_1.get_ls_const()[1] / eqn_1.get_ls_const()[0],eqn_1.get_ls_var());
-	//std::cout << "y-coef: " << solve_x.get_ls_const()[1].get_string() << std::endl;
-	//std::cout << "const: " << solve_x.get_ls_const()[0].get_string() << std::endl;
-	//substitute for x and solve
-	//if variables are in the same pos in both equations
-	Fraction y;
-	if (solve_x.get_ls_var()[0] == eqn_2.get_ls_var()[0]) {
-		Fraction solve_y_coef = (eqn_2.get_ls_const()[0] * solve_x.get_ls_const()[1]) + eqn_2.get_ls_const()[1];
-		//std::cout << eqn_2.get_ls_const()[0].get_string() << " * " << solve_x.get_ls_const()[1].get_string() << " + " << eqn_2.get_ls_const()[1].get_string() << std::endl;
-		Fraction const_term = (eqn_2.get_ls_const()[0] * solve_x.get_ls_const()[0]);
-		if (const_term.num >= 0)
-			const_term = eqn_2.get_rs() - const_term;
-		else
-			const_term = eqn_2.get_rs() + const_term;
-		solve_y_coef.simplify();
-		const_term.simplify();
-		y = const_term / solve_y_coef;
-		//y.simplify();
-	}
-	else {
+	boost::rational<int> var_1,var_1_const,var_1_coef,var_2,var_2_coef,var_2_const;
+	////coef of var_1 is 0
+	//if (eqn_1.get_ls_const()[0].numerator() == 0)
+	//	var_2 = eqn_1.get_rs() / eqn_1.get_ls_const()[1];
+	////coed of var_2 is 0
+	//if (eqn_1.get_ls_const()[1].numerator() == 0)
+	//	var_1 = eqn_1.get_rs() / eqn_1.get_ls_const()[0];
+	//if (eqn_1.get_ls_var[0] == eqn_2.get_ls_var[0]) {
+	//	if (eqn_2.get_ls_const()[0].numerator() == 0)
 
+	//}
+	if (eqn_1.get_ls_const()[0] == 0 && eqn_1.get_ls_const()[1] != 0)
+		var_2 = eqn_1.get_rs() / eqn_1.get_ls_const()[1];
+	else if (eqn_1.get_ls_const()[0] != 0 && eqn_1.get_ls_const()[1] == 0)
+		var_1 = eqn_1.get_rs() / eqn_1.get_ls_const()[0];
+	//CHECK IF 1 VAR HAS COEF OF 0 FIRST AND RETURN const/the coef of the other var
+	try {
+		var_1_const = eqn_1.get_rs() / eqn_1.get_ls_const()[0];
+		var_1_coef = eqn_1.get_op() == '-' ? eqn_1.get_ls_const()[1] / eqn_1.get_ls_const()[0] : (eqn_1.get_ls_const()[1] * -1) / eqn_1.get_ls_const()[0];
+		if (eqn_1.get_ls_var()[0] == eqn_2.get_ls_var()[0]) {
+			var_2_coef = eqn_2.get_op() == '+' ? eqn_2.get_ls_const()[0] * var_1_coef + eqn_2.get_ls_const()[1] : eqn_2.get_ls_const()[0] * var_1_coef - eqn_2.get_ls_const()[1];
+			var_2_const = eqn_2.get_ls_const()[0] * var_1_const < 0 ? eqn_2.get_rs() + eqn_2.get_ls_const()[0] * var_1_const : eqn_2.get_rs() - eqn_2.get_ls_const()[0] * var_1_const;
+			var_2 = (var_2_const / var_2_coef);
+			//plug var 2 in and solve for var_1
+			var_1 = var_1_const + var_1_coef * var_2;
+		}
 	}
-	//solve for x in either eq'n
-	Fraction x;
-	//OVERFLOW ON DIVISION OF Y BY CONST.
-	if (eqn_1.get_op() == '-')
-		x = (eqn_1.get_rs() / eqn_1.get_ls_const()[0]) + (y / eqn_1.get_ls_const()[0]);
-	else
-		x = (eqn_1.get_rs() / eqn_1.get_ls_const()[0]) - (y / eqn_1.get_ls_const()[0]);
-	//std::cout << (eqn_1.get_rs() / eqn_1.get_ls_const()[0]).get_string() << std::endl;
-	//std::cout << eqn_1.get_ls_var()[0] << std::endl;
-	return eqn_1.get_ls_var()[0] + " = " + y.get_string() + " " + eqn_1.get_ls_var()[1] + " = " + x.get_string();
+	catch (boost::exception_detail::clone_impl<boost::exception_detail::error_info_injector<boost::bad_rational>>) {
+		std::cout << "Invalid equation found" << std::endl;
+	}
+	std::string result = std::string(1,eqn_1.get_ls_var()[0]) + " = " + rational_to_string(var_1) + " " + eqn_1.get_ls_var()[1] + " = " + rational_to_string(var_2);
+	return result;
 }

@@ -1,6 +1,6 @@
 #include <string>
 #include <vector>
-#include "Fraction.h"
+#include "boost\rational.hpp"
 
 #ifndef EQUATION
 #define EQUATION
@@ -9,15 +9,15 @@ class Equation{
 public:
 	Equation();
 	Equation(std::string);
-	Equation(Fraction, char, Fraction,std::vector<char>);
+	Equation(boost::rational<int>, char, boost::rational<int>,std::vector<char>);
 	std::string get_string();
 	char get_op();
-	Fraction get_rs();
-	std::vector<Fraction> get_ls_const();
+	boost::rational<int> get_rs();
+	std::vector<boost::rational<int>> get_ls_const();
 	std::vector<char> get_ls_var();
 private:
-	Fraction rs;
-	std::vector<Fraction> ls_const;
+	boost::rational<int> rs;
+	std::vector<boost::rational<int>> ls_const;
 	std::vector<char> ls_var;
 	char op;
 };

@@ -122,6 +122,7 @@
   <ItemGroup>
     <ClInclude Include="Coordinate.h" />
     <ClInclude Include="Rectangle.h" />
+    <ClInclude Include="rect_func.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,6 +2,7 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 #include <random>
 #include "System.h"
 #include "strip.h"
@@ -32,7 +33,7 @@ inline void read_systems(vector<System> &systems) {
 		try {
 			systems.push_back(System(lines[i], lines[i + 1]));
 		}
-		catch (std::invalid_argument& e) {
+		catch (...) {
 			cout << "Invalid system found while parsing" << endl;
 			system("pause");
 			exit(EXIT_FAILURE);

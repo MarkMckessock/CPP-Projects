@@ -76,7 +76,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\Mark\Documents\Boost</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>C:\Users\Mark\Documents\Boost</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -123,6 +127,7 @@
   <ItemGroup>
     <ClInclude Include="Equation.h" />
     <ClInclude Include="Fraction.h" />
+    <ClInclude Include="rational_to_string.h" />
     <ClInclude Include="split.h" />
     <ClInclude Include="strip.h" />
     <ClInclude Include="sysfunc.h" />

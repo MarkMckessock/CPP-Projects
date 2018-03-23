@@ -47,5 +47,8 @@
     <ClInclude Include="sysfunc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="rational_to_string.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
