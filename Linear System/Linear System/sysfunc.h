@@ -16,6 +16,7 @@ inline int rand_int(int low, int high) {
 }
 
 inline void read_systems(vector<System> &systems) {
+	bool error = false;
 	string path, line;
 	vector<string> lines;
 	cout << "Enter the path of the file to read:" << endl;
@@ -35,11 +36,13 @@ inline void read_systems(vector<System> &systems) {
 		}
 		catch (...) {
 			cout << "Invalid system found while parsing" << endl;
-			system("pause");
-			exit(EXIT_FAILURE);
+			error = true;
 		}
 	}
-	cout << "Systems loaded sucessfully" << endl;
+	if(!error)
+		cout << "All systems loaded sucessfully" << endl;
+	else
+		cout << "Some systems loaded successfully" << endl;
 }
 
 inline void print_systems(vector<System> &systems, bool show_solutions = false) {
@@ -47,7 +50,12 @@ inline void print_systems(vector<System> &systems, bool show_solutions = false) 
 		cout << "System " << i + 1 << endl;
 		cout << systems[i].get_string() << endl << endl;
 		if (show_solutions) {
-			cout << "Solution: " << systems[i].solve() << endl;
+			try {
+				cout << "Solution: " << systems[i].solve() << endl;
+			}
+			catch (std::domain_error& e) {
+				cout << e.what() << endl;
+			}
 		}
 	}
 	if (systems.size() == 0)

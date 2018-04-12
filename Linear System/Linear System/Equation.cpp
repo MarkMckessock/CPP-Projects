@@ -66,19 +66,20 @@ Equation::Equation(std::string str) {
 	if (!split(str, ' ', splits))
 		throw std::invalid_argument("No spaces in equation");
 	try {
-	ls_var.push_back(splits[0].back());
-	ls_var.push_back(splits[2].back());
-	ls_const.push_back(make_rational(strip(splits[0], ls_var[0])));
-	ls_const.push_back(make_rational(strip(splits[2], ls_var[1])));
-	//check for double zero coefs
-	if (ls_const[0].numerator() == 0 && ls_const[1].numerator() == 0 && rs.numerator() != 0)
-		throw(std::domain_error("Invalid Equation"));
-	op = splits[1][0];
-	if (op == '-') {
-		ls_const[1] = ls_const[1] * -1;
-		op = '+';
-	}
-	rs = make_rational(splits[4]);
+		ls_var.push_back(splits[0].back());
+		ls_var.push_back(splits[2].back());
+		ls_const.push_back(make_rational(strip(splits[0], ls_var[0])));
+		ls_const.push_back(make_rational(strip(splits[2], ls_var[1])));
+		rs = make_rational(splits[4]);
+		//check for double zero coefs
+		if (ls_const[0].numerator() == 0 && ls_const[1].numerator() == 0 && rs.numerator() != 0) {
+			throw(std::domain_error("Invalid Equation"));
+		}
+		op = splits[1][0];
+		if (op == '-') {
+			ls_const[1] = ls_const[1] * -1;
+			op = '+';
+		}
 	}
 	catch (std::invalid_argument& e) {
 		throw;
