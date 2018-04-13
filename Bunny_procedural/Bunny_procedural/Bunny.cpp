@@ -10,22 +10,24 @@
 
 
 
-Bunny::Bunny(std::string _name){
+Bunny::Bunny(std::string _name,bool supress_output){
 	sex = rand_int(0, 1) ? male : female;
 	age = 0;
 	is_radioactive = rand_int(1, 100) <= 2;
 	name = _name;
 	if (is_radioactive) {
 		lifespan = 50;
-		std::cout << "Radioactive Mutant Vampire Bunny " << name << " was born." << std::endl;
+		if(!supress_output)
+			std::cout << "Radioactive Mutant Vampire Bunny " << name << " was born." << std::endl;
 	}
 	else {
 		lifespan = 10;
-		std::cout << "Bunny " << name << " was born." << std::endl;
+		if(!supress_output)
+			std::cout << "Bunny " << name << " was born." << std::endl;
 	}
 }
 
-Bunny::Bunny(std::string _name, Color _color) :Bunny(_name) {
+Bunny::Bunny(std::string _name, Color _color, bool supress_output) :Bunny(_name,supress_output) {
 	color = _color;
 }
 
@@ -58,10 +60,11 @@ std::list<Bunny>::iterator Bunny::kill(std::list<Bunny>& bunnies, std::vector<Bu
 	return bunnies.erase(iter);
 }
 
-Bunny* Bunny::infect(std::map<Sex, std::vector<Bunny*>> &fertility) {
+Bunny* Bunny::infect(std::map<Sex, std::vector<Bunny*>> &fertility,bool supress_output) {
 	is_radioactive = true;
 	lifespan = 50;
-	std::cout << "Bunny " << name << " became infected." << std::endl;
+	if(!supress_output)
+		std::cout << "Bunny " << name << " became infected." << std::endl;
 	make_infertile(fertility);
 	return this;
 }
