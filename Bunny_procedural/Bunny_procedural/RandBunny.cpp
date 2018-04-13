@@ -1,5 +1,6 @@
 #include "RandBunny.h"
 #include "rand.h"
+#include <array>
 
 
 

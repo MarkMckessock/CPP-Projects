@@ -9,82 +9,126 @@
 #include "Names.h"
 #include "rand.h"
 
-int cull(std::list<Bunny> &bunnies, std::vector<Bunny*> &mutants, std::map<Sex, std::vector<Bunny*>> &fertility) {
+int cull(std::list<Bunny> &bunnies, std::vector<Bunny*> &mutants, std::map<Sex, std::vector<Bunny*>> &fertility, std::map<int, std::map<int,bool>>& empty_spaces) {
 	int death_toll = bunnies.size() / 2;
 	auto iter = bunnies.begin();
 	for (int i = 0; i < death_toll; i++) {
 		std::advance(iter, rand_int(0, 1));
-		iter = iter->kill(bunnies, mutants, fertility, iter, true);
+		iter = iter->kill(bunnies, mutants, fertility, iter,empty_spaces, true);
 	}
 	return death_toll;
 }
 
-void draw_grid() {
+void draw_grid(std::map<int, std::map<int, bool>>& empty_spaces, std::array<std::array<Bunny*, 20>, 50>& grid) {
 	for (int i = 0; i < 50; i++) {
 		std::cout << " _";
 	}
 	std::cout << std::endl;
-	for (int i = 0; i < 20; i++){
-		for (int j = 0; j < 50; j++) {
-			std::cout << "|" << "_";
+	for (int y = 0; y < 20; y++){
+		for (int x = 0; x < 50; x++) {
+			std::cout << "|";
+			if (!empty_spaces[x][y]) {
+				if (grid[x][y]->is_radioactive)
+					std::cout << "V";
+				else if ((grid[x][y])->sex == male) {
+					if (grid[x][y]->age >= 2)
+						std::cout << "M";
+					else
+						std::cout << "m";
+				}
+				else {
+					if (grid[x][y]->age >= 2)
+						std::cout << "F";
+					else
+						std::cout << "f";
+				}
+			}
+			else
+				std::cout << "_";
 		}
 		std::cout << "|" << std::endl;
 	}
 }
 
-void reproduce(std::list<Bunny> &bunnies, std::map<Sex,std::vector<Bunny*>> &fertility,Names names,std::vector<Bunny*>& mutants){
+void reproduce(std::list<Bunny> &bunnies, std::map<Sex,std::vector<Bunny*>> &fertility,Names names,std::vector<Bunny*>& mutants,std::map<int, std::map<int, bool>>& empty_spaces, std::array<std::array<Bunny*, 20>, 50>& grid){
 	if (fertility[male].size() > 0)
 		for (int i = 0; i < fertility[female].size(); i++) {
-			if (bunnies.size() > 1000) {
-				std::cout << "A food shortage occurred killing " << cull(bunnies, mutants, fertility) << " bunnies." << std::endl;
+			if (bunnies.size() > 999) {
+				std::cout << "A food shortage occurred killing " << cull(bunnies, mutants, fertility,empty_spaces) << " bunnies." << std::endl;
 				return;
 			}
-			bunnies.push_back(Bunny(names.choose(), (*fertility[female][i]).color));
+			auto possible_spawns = fertility[female][i]->get_surrounding_empty_spaces(empty_spaces);
+			if (possible_spawns.size()) {
+				bunnies.push_back(Bunny(names.choose(), (*fertility[female][i]).color));
+				auto iter = bunnies.end();
+				--iter;
+				iter->set_grid(empty_spaces,grid,possible_spawns[rand_int(0,possible_spawns.size()-1)]);
+			}
 		}
 }
 
-void infect_bunnies(std::list<Bunny> &bunnies,std::vector<Bunny*> &mutants,std::map<Sex,std::vector<Bunny*>> &fertility){
-	for (int i = 0; i < mutants.size(); i++) {
-		auto iter = bunnies.begin();
-		std::advance(iter, rand_int(0, bunnies.size()-1));
-		iter->infect(fertility);
+void infect_bunnies(std::list<Bunny> &bunnies,std::vector<Bunny*> &mutants,std::map<Sex,std::vector<Bunny*>> &fertility, std::array<std::array<Bunny*, 20>, 50>& grid, std::map<int, std::map<int, bool>>& empty_spaces){
+	int mutant_count = mutants.size();
+	std::vector<std::pair<int,int>> surrounding_bunnies;
+	for (int i = 0; i < mutant_count; i++) {
+		surrounding_bunnies = mutants[i]->get_surround_uninfected(empty_spaces,grid);
+		if (surrounding_bunnies.size()) {
+			std::pair<int, int> target = surrounding_bunnies[rand_int(0, surrounding_bunnies.size() - 1)];
+			mutants.push_back(grid[target.first][target.second]->infect(fertility));
+		}
 	}
 }
 
-void gen_original_bunnies(std::list<Bunny> &bunnies,Names names) {
-	for (int i = 0; i < 5; i++)
+void gen_original_bunnies(std::list<Bunny> &bunnies,Names names, std::map<int, std::map<int, bool>>& empty_spaces,std::array<std::array<Bunny*, 20>, 50>& grid) {
+	for (int i = 0; i < 5; i++) {
 		bunnies.push_back(RandBunny(names.choose()));
+		auto iter = bunnies.end();
+		--iter;
+		iter->set_grid(empty_spaces,grid);
+	}
 }
 
 int main() {
 	Names names;
 	std::list<Bunny> bunnies;
-	gen_original_bunnies(bunnies, names);
+	std::array<std::array<Bunny*, 20>, 50> grid;
+	std::map<int,std::map<int,bool>> empty_spaces;
+	for (int x = 0; x < 50; x++)
+		for (int y = 0; y < 20; y++)
+			empty_spaces[x][y] = true;
 	std::map<Sex, std::vector<Bunny*>> fertility;
 	std::vector<Bunny*> mutants;
-	std::array<std::array<Bunny*, 20>, 50> grid;
-	std::vector<std::pair<int, int>> empty_spaces;
+
+	gen_original_bunnies(bunnies, names,empty_spaces,grid);
 
 	while (bunnies.size()) {
+		reproduce(bunnies, fertility, names, mutants, empty_spaces, grid);
 		for (auto iter = bunnies.begin(); iter != bunnies.end();) {
-			if (iter->age == 0 && iter->is_radioactive)//add mutants to vector at birth
+			//add mutants to vector at birth
+			if (iter->age == 0 && iter->is_radioactive)
 				mutants.push_back(&(*iter));
+
 			iter->increase_age(1);
-			if (iter->age == 2 && !iter->is_radioactive) //bunny becomes fertile
+
+			//bunnies move randomly 1 space in any direction
+			if(iter->age != 1)
+				iter->move(empty_spaces, grid);
+
+			//bunny becomes fertile at 2 years
+			if (iter->age == 2 && !iter->is_radioactive) 
 				fertility[iter->sex].push_back(&(*iter));
-			else {
-				if (iter->age == iter->lifespan)//bunny dies
-					//iter = kill_bunny(bunnies, fertility, mutants, iter);
-					iter = iter->kill(bunnies,mutants,fertility,iter);
-				else
-					iter++;
-			}
+
+			//bunny dies @ 10 years and mutants die @ 50 years
+			if (iter->age == iter->lifespan)
+				iter = iter->kill(bunnies,mutants,fertility,iter,empty_spaces);
+			else
+				iter++;
 		}			
+		infect_bunnies(bunnies,mutants,fertility,grid,empty_spaces);
 		std::cout << "Bunnies alive: " << bunnies.size() << " Mutants: " << mutants.size() << " Fertile: " << fertility[female].size() << std::endl;
-		draw_grid();
+		draw_grid(empty_spaces, grid);
 		system("pause");
-		reproduce(bunnies,fertility,names,mutants);
-		infect_bunnies(bunnies,mutants,fertility);
 
 	}
+	std::cout << "All bunnies have died. Simulation terminated." << std::endl;
 }
