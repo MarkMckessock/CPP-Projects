@@ -1,21 +1,14 @@
-#include "Fraction.h"
-#include <vector>
+#include "boost\rational.hpp"
 #include <string>
-
-#ifndef EXPRESSION
-#define EXPRESSION
 
 class Expression{
 public:
-	Expression();
-	void read();
-	void parse();
-	void print();
-	bool validate();
-private:	
-	std::vector<Fraction> operands;
-	std::vector<std::string> operators;
-	std::string expr_string;
+	Expression(std::string str);
+	std::string get_string();
+private:
+	boost::rational<int> operand_1;
+	boost::rational<int> operand_2;
+	char _operator;
+
 };
 
-#endif

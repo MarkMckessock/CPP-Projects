@@ -1,6 +1,5 @@
 #include <string>
 #include <algorithm>
-
 #ifndef STRIP
 #define STRIP
 

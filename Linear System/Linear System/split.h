@@ -9,7 +9,7 @@ inline bool split (std::string& s, char delimiter, std::vector<std::string> &spl
 	std::vector<std::string> splits;
 	std::string split = "";
 	int i = 0;
-	bool empty_split;
+	bool empty_split = true;
 	while (i < s.size()) {
 		while (s[i] != delimiter && i < s.size()) {
 			empty_split = false;

@@ -21,9 +21,6 @@
     <ClCompile Include="Expression.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Fraction.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Expression.h">
@@ -32,13 +29,7 @@
     <ClInclude Include="split.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Fraction.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="strip.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="is_operator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

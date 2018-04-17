@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{C34D2C55-740B-4998-8A0A-36B3F2E2A902}</ProjectGuid>
+    <ProjectGuid>{A93468B3-73D9-460F-A2C9-3548FFCB8950}</ProjectGuid>
     <RootNamespace>parseexpression</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -76,7 +76,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\Mark\Documents\Boost</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>C:\Users\Mark\Documents\Boost</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -116,13 +120,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Expression.cpp" />
-    <ClCompile Include="Fraction.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Expression.h" />
-    <ClInclude Include="Fraction.h" />
-    <ClInclude Include="is_operator.h" />
     <ClInclude Include="split.h" />
     <ClInclude Include="strip.h" />
   </ItemGroup>

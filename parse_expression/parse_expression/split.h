@@ -5,13 +5,18 @@
 #ifndef SPLIT
 #define SPLIT
 
-inline bool split (std::string& s, char delimiter, std::vector<std::string> &split_target){
+bool is_operator(char _char) {
+	return _char == '+' || _char == '-' || _char == '*' || _char == '/';
+}
+
+inline bool split(std::string& s, char delimiter, std::vector<std::string> &split_target) {
 	std::vector<std::string> splits;
 	std::string split = "";
 	int i = 0;
-	bool empty_split;
+	bool empty_split = true;
 	while (i < s.size()) {
-		while (s[i] != delimiter && i < s.size()) {
+		//exit loop when delimiter is found, given that delimiter is not the first char or preceeded by an operator
+		while ((s[i] != delimiter || i == 0 || is_operator(s[i-1]) || s[i-1] == '(') && i < s.size()) {
 			empty_split = false;
 			split += s[i];
 			i++;
