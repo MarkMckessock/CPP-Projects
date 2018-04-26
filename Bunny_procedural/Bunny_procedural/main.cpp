@@ -102,8 +102,8 @@ int main() {
 	const bool show_births = false;
 	const bool show_deaths = false;
 	const bool show_infections = false;
-	const bool show_grid = true;
-	const bool show_stats = false;
+	const bool show_grid = false;
+	const bool show_stats = true;
 
 	gen_original_bunnies(bunnies, names,empty_spaces,grid,show_births);
 
@@ -131,11 +131,12 @@ int main() {
 				iter++;
 		}			
 		infect_bunnies(bunnies,mutants,fertility,grid,empty_spaces,show_infections);
+		system("cls");
 		if(show_stats)
 			std::cout << "Bunnies alive: " << bunnies.size() << " Mutants: " << mutants.size() << " Fertile: " << fertility[female].size() << std::endl;
-		system("cls");
 		if(show_grid)
 			draw_grid(empty_spaces, grid);
+		system("pause");
 	}
 	std::cout << "All bunnies have died. Simulation terminated." << std::endl;
 	system("pause");

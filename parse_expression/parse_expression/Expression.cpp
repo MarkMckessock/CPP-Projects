@@ -1,8 +1,9 @@
-#include "Expression.h"
 #include <string>
-#include "split.h"
-#include "strip.h"
+#include <iostream>
+#include <algorithm>
+#include "functions.h"
 #include "boost\rational.hpp"
+#include "Expression.h"
 
 boost::rational<int> make_rational(std::string str) {
 	int numerator, denominator;
@@ -15,6 +16,7 @@ boost::rational<int> make_rational(std::string str) {
 		}
 		else
 			numerator = std::stoi(strip(splits[0], "()"));
+
 		if (strip(splits[1], "()")[0] == '-') {
 			denominator = std::stoi(strip(strip(splits[1], "()"), '-'));
 			numerator *= -1;
@@ -22,6 +24,7 @@ boost::rational<int> make_rational(std::string str) {
 		else
 			denominator = std::stoi(strip(splits[1], "()"));
 	}
+	//operand is a single number (not a fraction)
 	else {
 		if (str[0] == '-') {
 			numerator = std::stoi(strip(strip(str, "()"), '-'));
@@ -29,92 +32,95 @@ boost::rational<int> make_rational(std::string str) {
 		}
 		else
 			try {
-			numerator = std::stoi(strip(str, "()"));
-		}
-		catch (std::invalid_argument& e) {
-			throw;
+				numerator = std::stoi(strip(str, "()"));
+			}
+			catch (...) {
+				throw;
 		}
 		denominator = 1;
 	}
-	//catch divide by 0
-	if (denominator == 0) {
-		throw std::domain_error("Divide by zero");
+	try {
+		return boost::rational<int>(numerator, denominator);
 	}
-
-	if (numerator < 0 && denominator < 0) {
-		//eliminate negative/negative
-		numerator *= -1;
-		denominator *= -1;
+	catch (...) {
+		throw std::domain_error("Undefined Expression: Divide by zero");
 	}
-	else if (numerator > 0 && denominator < 0) {
-		// always keep negatives in the numerator
-		numerator *= -1;
-		denominator *= -1;
-	}
-	return boost::rational<int>(numerator, denominator);
 }
 
 Expression::Expression(std::string str){
-	for (auto& item : str) {
-		if (item ==*(&item + 1) && is_operator(item))
-			throw std::domain_error("Invalid expression (Double operator)");
-	}
 	std::vector<std::string> splits;
-	if (split(str, '-', splits)) {
-		if (splits.size() > 2)
-			throw std::domain_error("Invalid Expression");
-		_operator = '-';
-		try {
-			operand_1 = make_rational(splits[0]);
-			operand_2 = make_rational(splits[1]);
-		}
-		catch (...) {
-			throw;
+	std::string ls, rs;
+	//empty string
+	if (str.size() == 0)
+		throw std::domain_error("Invalid Expression: Empty string");
+	//catch invalid chars
+	for (auto& item : str) {
+		if (item < '0' && item > '9' && (!is_operator(item) && item != ')' && item != '(' && item != ' '))
+			throw std::domain_error("Invalid Expression: Invalid character entered");
+	}
+	//find spaces in between numbers
+	if (split(str, ' ', splits)) {
+		for (int i = 0; i < splits.size()-1; i++) {
+			if (is_int(splits[i].back()) && is_int(splits[i + 1][0]))
+				throw std::domain_error("Invalid Expression: Spaces in operand");
 		}
 	}
-	else if (split(str, '+', splits)) {
+	//remove spaces and brackets
+	str.erase(remove_if(str.begin(), str.end(), isspace), str.end());
+	str = strip(str, "()");
+
+	//operator is '+'
+	if (split(str, '+', splits)) {
 		if (splits.size() > 2)
-			throw std::domain_error("Invalid Expression");
+			throw std::domain_error("Invalid Expression: More than 1 '+' character");
 		_operator = '+';
-		try {
-			operand_1 = make_rational(splits[0]);
-			operand_2 = make_rational(splits[1]);
-		}
-		catch (...) {
-			throw;
-		}
+		ls = splits[0];
+		rs = splits[1];
 	}
+	//operator is '*'
 	else if (split(str, '*', splits)) {
 		if (splits.size() > 2)
-			throw std::domain_error("Invalid Expression");
+			throw std::domain_error("Invalid Expression: More than 1 '*' character");
 		_operator = '*';
-		try {
-			operand_1 = make_rational(splits[0]);
-			operand_2 = make_rational(splits[1]);
-		}
-		catch (...) {
-			throw;
-		}
+		ls = splits[0];
+		rs = splits[1];
 	}
-	else if (split(str, '/', splits)) {
+	//operator is '/'
+	else if (split(str, '/', splits) && splits.size() > 3) {
 		_operator = '/';
-		try {
-			operand_1 = make_rational(splits[0] + '/' + splits[1]);
-			operand_2 = make_rational(splits[2] + '/' + splits[3]);
-		}
-		catch (...) {
-			throw;
-		}
+		ls = splits[0] + '/' + splits[1];
+		rs = splits[2] + '/' + splits[3];
 	}
+	//operatir is '-'
+	else if (split(str, '-', splits)) {
+		_operator = '-';
+		ls = splits[0];
+		rs = splits[1];
+	}
+	else
+		throw std::domain_error("Invalid Expression: No operator found");
+	try {
+		operand_1 = make_rational(ls);
+		operand_2 = make_rational(rs);
+	}
+	catch (...) {
+		throw;
+	}
+
+	//ex 4 - (-4) -> 4 + 4
 	if (_operator == '-' && operand_2.numerator() < 0) {
 		operand_2 *= -1;
 		_operator = '+';
 	}
+	//ex 4 + (-4) -> 4 - 4
 	else if (_operator == '+' && operand_2.numerator() < 0) {
 		operand_2 *= -1;
 		_operator = '-';
 	}
 
+	//Prevent division by 0
+	if (_operator == '/' && operand_2 == 0)
+		throw std::domain_error("Undefined Expression: Divide by zero");
 }
 
 std::string Expression::get_string() {
