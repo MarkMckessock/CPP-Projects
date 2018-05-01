@@ -11,7 +11,7 @@ inline bool split (std::string& s, char delimiter, std::vector<std::string> &spl
 	int i = 0;
 	bool empty_split = true;
 	while (i < s.size()) {
-		while (s[i] != delimiter && i < s.size()) {
+		while (i < s.size() && (s[i] != delimiter || delimiter == '-' && (s[i-1] == '(' || s[i-1] == '/' || s[i-1] == '='))) {
 			empty_split = false;
 			split += s[i];
 			i++;

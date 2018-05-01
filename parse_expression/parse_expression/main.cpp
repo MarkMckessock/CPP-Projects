@@ -10,16 +10,18 @@ using std::cin;
 using std::endl;
 
 int main() {
-	std::unique_ptr<Expression> expression;
 	std::string expr_str;
+	std::vector<Expression> expressions;
+	int expr_count;
+	cout << "How many expressions do you want to create? " << endl;
+	cin >> expr_count;
 
-	while (true) {
-		cout << "Enter a valid expression" << endl;
-		getline(cin, expr_str);
-		try {
-			expression.reset(new Expression(expr_str));
-			cout << "Expression: " << expression->get_string() << endl;
-			system("pause");
+	for (int i = 0; i < expr_count;) {
+		try{
+			cout << "Enter your expression:" << endl;
+			getline(cin, expr_str);
+			expressions.push_back(Expression(expr_str));
+			i++;
 		}
 		catch (std::domain_error& e) {
 			cout << e.what() << endl;

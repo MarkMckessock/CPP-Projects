@@ -20,6 +20,7 @@ boost::rational<int> make_rational(std::string str) {
 		}
 		else
 			numerator = std::stoi(strip(splits[0], "()"));
+
 		if (strip(splits[1], "()")[0] == '-') {
 			denominator = std::stoi(strip(strip(splits[1], "()"), '-'));
 			numerator *= -1;
@@ -27,6 +28,7 @@ boost::rational<int> make_rational(std::string str) {
 		else
 			denominator = std::stoi(strip(splits[1], "()"));
 	}
+	//operand is a single number (not a fraction)
 	else {
 		if (str[0] == '-') {
 			numerator = std::stoi(strip(strip(str, "()"), '-'));
@@ -36,53 +38,58 @@ boost::rational<int> make_rational(std::string str) {
 			try {
 			numerator = std::stoi(strip(str, "()"));
 		}
-		catch (std::invalid_argument& e) {
+		catch (...) {
 			throw;
 		}
 		denominator = 1;
 	}
-
-	if (denominator== 0) {
-		std::cout << "Divide by zero error" << std::endl;
-		system("pause");
-		exit(EXIT_FAILURE);
-	}
-
-
-	if (numerator < 0 && denominator < 0) {
-		//eliminate negative/negative
-		numerator *= -1;
-		denominator *= -1;
-	}
-	else if (numerator > 0 && denominator < 0) {
-		// always keep negatives in the numerator
-		numerator *= -1;
-		denominator *= -1;
-	}
-	return boost::rational<int>(numerator, denominator);
-}
-Equation::Equation(std::string str) {
-	std::vector<std::string> splits;
-	if (!split(str, ' ', splits))
-		throw std::invalid_argument("No spaces in equation");
 	try {
-		ls_var.push_back(splits[0].back());
-		ls_var.push_back(splits[2].back());
-		ls_const.push_back(make_rational(strip(splits[0], ls_var[0])));
-		ls_const.push_back(make_rational(strip(splits[2], ls_var[1])));
-		rs = make_rational(splits[4]);
-		//check for double zero coefs
-		if (ls_const[0].numerator() == 0 && ls_const[1].numerator() == 0 && rs.numerator() != 0) {
-			throw(std::domain_error("Invalid Equation"));
-		}
-		op = splits[1][0];
-		if (op == '-') {
-			ls_const[1] = ls_const[1] * -1;
-			op = '+';
-		}
+		return boost::rational<int>(numerator, denominator);
 	}
-	catch (std::invalid_argument& e) {
-		throw;
+	catch (...) {
+		throw std::domain_error("Undefined Expression: Divide by zero");
+	}
+}
+
+Equation::Equation(std::string str) {
+	//remove all spaces
+	str.erase(remove_if(str.begin(), str.end(), isspace), str.end());
+	//get ls of eqn
+	std::vector<std::string> splits;
+	if (split(str, '+', splits)) {
+		op = '+';
+	}
+	else {
+		op = '-';
+		split(str, '-', splits);
+	}
+	std::vector<std::string> sub_split;
+	if (!split(splits[0], ')', sub_split))
+		throw std::domain_error("Brackets are required");
+	ls_var.push_back(sub_split[1][0]);
+	ls_const.push_back(make_rational(sub_split[0]));
+
+	if (!split(splits[1], '=', sub_split))
+		throw std::domain_error("Equals sign is required");
+	if (!split(sub_split[0], ')', splits))
+		throw std::domain_error("Brackets are required");
+	ls_var.push_back(splits[1][0]);
+	ls_const.push_back(make_rational(splits[0]));
+	//get rs of eqn
+	if (split(str, '=', splits))
+		rs = make_rational(splits[1]);
+	else
+		throw std::domain_error("Equation must have '='");
+	//check for double zero coef
+	//check for --
+	if (op == '-' && ls_const[1] < 0) {
+		op = '+';
+		ls_const[1] *= -1;
+	}
+	//check for +-
+	if (op == '+' && ls_const[1] < 0) {
+		op = '-';
+		ls_const[1] *= -1;
 	}
 }
 
