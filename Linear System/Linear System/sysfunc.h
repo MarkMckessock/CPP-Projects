@@ -68,10 +68,10 @@ inline void gen_random_system(vector<System> & systems) {
 	cout << "How many random systems do you wish to generate?" << endl;
 	cin >> rand_count;
 	for (int i = 0; i < rand_count; i++) {
-		eqn_1 = to_string(rand_int(-25, 25)) + "/" + to_string(rand_int(1, 4)) + "x" + (rand_int(0, 1) ? " + " : " - ") +
-			to_string(rand_int(-25, 25)) + "/" + to_string(rand_int(1, 4)) + "y = " + to_string(rand_int(-25, 25)) + "/" + to_string(rand_int(1, 4));
-		eqn_2 = to_string(rand_int(-25, 25)) + "/" + to_string(rand_int(1, 4)) + "x" + (rand_int(0, 1) ? " + " : " - ") +
-			to_string(rand_int(-25, 25)) + "/" + to_string(rand_int(1, 4)) + "y = " + to_string(rand_int(-25, 25)) + "/" + to_string(rand_int(1, 4));
+		eqn_1 = '(' + to_string(rand_int(-99,99)) + "/" + to_string(rand_int(0,1)? rand_int(1, 99) : rand_int(-99,-1)) + ")x" + (rand_int(0, 1) ? " + " : " - ") +
+			 '(' + to_string(rand_int(-99, 99)) + "/" + to_string(rand_int(0, 1) ? rand_int(1, 99) : rand_int(-99, -1)) + ")y = " + to_string(rand_int(0, 1) ? rand_int(1, 99) : rand_int(-99, -1)) + "/" + to_string(rand_int(0, 1) ? rand_int(1, 99) : rand_int(-99, -1));
+		eqn_2 = '(' + to_string(rand_int(-99, 99)) + "/" + to_string(rand_int(0, 1) ? rand_int(1, 99) : rand_int(-99, -1)) + ")x" + (rand_int(0, 1) ? " + " : " - ") +
+			'(' + to_string(rand_int(-99, 99)) + "/" + to_string(rand_int(0, 1) ? rand_int(1, 99) : rand_int(-99, -1)) + ")y = " + to_string(rand_int(0, 1) ? rand_int(1, 99) : rand_int(-99, -1)) + "/" + to_string(rand_int(0, 1) ? rand_int(1, 99) : rand_int(-99, -1));
 		systems.push_back(System(eqn_1, eqn_2));
 	}
 	cout << rand_count << " systems generated successfully." << endl;
