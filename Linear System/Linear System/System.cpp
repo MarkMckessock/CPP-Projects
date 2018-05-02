@@ -30,107 +30,71 @@ std::string System::get_string() {
 	return eqn_1.get_string() + "\n" + eqn_2.get_string();
 }
 
-boost::rational<int> System::solve_y() {
-	boost::rational<int> var_1, var_1_coef, var_1_const, var_2_coef, var_2_const;
-	//std::cout << eqn_1.get_rs() << "/" << eqn_1.get_ls_const()[0] << std::endl;
-	//std::cout << eqn_1.get_rs() / eqn_1.get_ls_const()[0] << std::endl;
-	//std::cout << eqn_1.get_ls_const()[1] << " * -1 / " << eqn_1.get_ls_const()[0] << std::endl;
-	//std::cout << (eqn_1.get_ls_const()[1] * -1) / eqn_1.get_ls_const()[0] << std::endl;
-	var_1_const = eqn_1.get_rs() / eqn_1.get_ls_const()[0];
-	var_1_coef = eqn_1.get_op() == '-' ? eqn_1.get_ls_const()[1] / eqn_1.get_ls_const()[0] : (eqn_1.get_ls_const()[1] * -1) / eqn_1.get_ls_const()[0];
-	//std::cout << "var /" << var_1_const << "/" << var_1_coef << std::endl;
+boost::rational<int> solve_var_2(Equation eqn_1, Equation eqn_2) {
+	boost::rational<int> rs, var_2, var_2_coef;
 	if (eqn_1.get_ls_var()[0] == eqn_2.get_ls_var()[0]) {
-		var_2_coef = eqn_2.get_op() == '+' ? eqn_2.get_ls_const()[0] * var_1_coef + eqn_2.get_ls_const()[1] : eqn_2.get_ls_const()[0] * var_1_coef - eqn_2.get_ls_const()[1];
-		/*std::cout << "operation " << eqn_2.get_ls_const()[0] << " * " << var_1_coef << " + " << eqn_2.get_ls_const()[1] << std::endl;
-		std::cout << "var_2_coef" << var_2_coef << std::endl;*/
-		var_2_const = eqn_2.get_ls_const()[0] * var_1_const < 0 ? eqn_2.get_rs() + eqn_2.get_ls_const()[0] * var_1_const : eqn_2.get_rs() - eqn_2.get_ls_const()[0] * var_1_const;
-		//std::cout << "operation" << eqn_2.get_rs() << " - " << eqn_2.get_ls_const()[0] << " * " << var_1_const << std::endl;
-		//std::cout << "var_2_const" << var_2_const << std::endl;
-		if (var_2_coef == 0 && var_2_const == 0)
-			throw(std::domain_error("Lines are parrallel"));
-		return (var_2_const / var_2_coef);
+		if(eqn_1.get_ls_const()[0] == 0)
+			return eqn_1.get_rs() / (eqn_1.get_op() == '-' ? -eqn_1.get_ls_const()[1] : eqn_1.get_ls_const()[1]);
+		if(eqn_2.get_ls_const()[0] == 0)
+			return eqn_2.get_rs() / (eqn_2.get_op() == '-' ? -eqn_2.get_ls_const()[1] : eqn_2.get_ls_const()[1]);
+		boost::rational<int> mult = eqn_1.get_ls_const()[0] / -eqn_2.get_ls_const()[0];
+		var_2_coef = (eqn_1.get_op() == '-' ? -eqn_1.get_ls_const()[1] : eqn_1.get_ls_const()[1]) + (eqn_2.get_op() == '-' ? -mult * eqn_2.get_ls_const()[1] : mult * eqn_2.get_ls_const()[1]);
+		rs = eqn_1.get_rs() + mult * eqn_2.get_rs();
+		return rs / var_2_coef;
 	}
 	else {
-		var_2_coef =  eqn_2.get_ls_const()[1] * var_1_coef + eqn_2.get_ls_const()[0];
-		var_2_const = eqn_2.get_rs() - eqn_2.get_ls_const()[1] * var_1_const;
-		if (var_2_coef == 0 && var_2_const == 0)
-			throw(std::domain_error("Lines are parrallel"));
-		return (var_2_const / var_2_coef);
+		if (eqn_1.get_ls_const()[0] == 0)
+			return eqn_1.get_rs() / (eqn_1.get_op() == '-' ? -eqn_1.get_ls_const()[1] : eqn_1.get_ls_const()[1]);
+		if (eqn_2.get_ls_const()[1] == 0)
+			return eqn_2.get_rs() / eqn_2.get_ls_const()[1];
+		boost::rational<int> mult = eqn_1.get_ls_const()[0] / -(eqn_2.get_op() == '-' ? -eqn_2.get_ls_const()[1] : eqn_2.get_ls_const()[1]);
+		var_2_coef = eqn_2.get_ls_const()[0]*mult + (eqn_1.get_op() == '-' ? -eqn_1.get_ls_const()[1] : eqn_1.get_ls_const()[1]);
+		rs = eqn_1.get_rs() + mult * eqn_2.get_rs();
+		return rs / var_2_coef;
 	}
 }
 
-boost::rational<int> System::solve_x(boost::rational<int> var_1_const, boost::rational<int> var_1_coef, boost::rational<int> &var_2) {
-	return var_1_const + var_1_coef * var_2;
+boost::rational<int> solve_var_1(Equation eqn_1, Equation eqn_2) {
+	if (eqn_1.get_ls_const()[1] == 0)
+		return eqn_1.get_rs() / eqn_1.get_ls_const()[0];
+	if (eqn_2.get_ls_const()[1] == 0)
+		return eqn_2.get_rs() / eqn_2.get_ls_const()[0];
+	boost::rational<int> rs, var_1, var_1_coef, mult;
+	if (eqn_1.get_ls_var()[0] == eqn_2.get_ls_var()[0]) {
+		if (eqn_1.get_op() == '-') {
+			if (eqn_2.get_op() == '-')
+				mult = -eqn_1.get_ls_const()[1] / eqn_2.get_ls_const()[1];
+			else {
+				mult = eqn_1.get_ls_const()[1] / eqn_2.get_ls_const()[1];
+			}
+		}
+		else {
+			if(eqn_2.get_op() == '-')
+				mult = eqn_1.get_ls_const()[1] / eqn_2.get_ls_const()[1];
+			else
+				mult = eqn_1.get_ls_const()[1] / -eqn_2.get_ls_const()[1];
+		}
+		var_1_coef = eqn_1.get_ls_const()[0] + mult * eqn_2.get_ls_const()[0];
+		rs = eqn_1.get_rs() + mult * eqn_2.get_rs();
+		return rs / var_1_coef;
+	}
+	else {	
+		if (eqn_1.get_ls_const()[1] == 0)
+			return eqn_1.get_rs() / eqn_1.get_ls_const()[0];
+		if (eqn_2.get_ls_const()[0] == 0)
+			return eqn_2.get_rs() / (eqn_2.get_op() == '-' ? -eqn_2.get_ls_const()[1] : eqn_2.get_ls_const()[1]);
+		boost::rational<int> mult = (eqn_1.get_op()== '-' ? -eqn_1.get_ls_const()[1] : eqn_1.get_ls_const()[1]) / -eqn_2.get_ls_const()[0];
+		var_1_coef = eqn_1.get_ls_const()[0] + (eqn_2.get_op() == '-' ? -mult * eqn_2.get_ls_const()[1] : mult * eqn_2.get_ls_const()[1]);
+		rs = eqn_1.get_rs() + mult * eqn_2.get_rs();
+		return rs / var_1_coef;
+	}
 }
 
 std::string System::solve(){
-	boost::rational<int> var_1,var_1_const,var_1_coef,var_2,var_2_coef,var_2_const;
-	if (eqn_1.get_ls_const()[0] == 0 && eqn_1.get_ls_const()[1] && eqn_2.get_ls_const()[0] && eqn_2.get_ls_const()[1]) {
-		var_2 = eqn_1.get_rs() / eqn_1.get_ls_const()[1];
-		//(0x+By=C)(Ax+By=C)
-		if(eqn_1.get_ls_var()[0] == eqn_2.get_ls_var()[0])
-			var_1 = solve_x(eqn_2.get_rs() / eqn_2.get_ls_const()[0], eqn_2.get_op() == '-' ? eqn_2.get_ls_const()[1] / eqn_2.get_ls_const()[0] : (eqn_2.get_ls_const()[1] * -1) / eqn_2.get_ls_const()[0],var_2);
-		//(0x+By=C)(By+Ax=C)
-		else
-			var_1 = solve_x(eqn_2.get_op() == '-' ? eqn_2.get_rs()*-1 / eqn_2.get_ls_const()[0]: eqn_2.get_rs() / eqn_2.get_ls_const()[0], eqn_2.get_op() == '-' ? eqn_2.get_ls_const()[0] / eqn_2.get_ls_const()[1] : (eqn_2.get_ls_const()[1] * -1) / eqn_2.get_ls_const()[0], var_2);
-	}
-	//(Ax+0y=C)(Ax+By=C)
-	if (eqn_1.get_ls_const()[0] && eqn_1.get_ls_const()[1] == 0 && eqn_2.get_ls_const()[0] && eqn_2.get_ls_const()[1]) {
-		var_2 = solve_y();
-		var_1 = eqn_1.get_rs() / eqn_1.get_ls_const()[0];
-	}
-	if (eqn_2.get_ls_const()[0] && eqn_2.get_ls_const()[1] == 0 && eqn_1.get_ls_const()[0] && eqn_1.get_ls_const()[1]) {
-		//(Ax+By=C)(Ax+0y=C)
-		if (eqn_2.get_ls_var()[0] == eqn_1.get_ls_var()[0]) {
-			var_1 = eqn_2.get_rs() / eqn_2.get_ls_const()[0];
-			var_2 = solve_y();
-		}
-		//(Ax+By=C)(Bx+0y=C)
-		else {
-			var_2 = eqn_2.get_rs() / eqn_2.get_ls_const()[0];
-			var_1 = solve_x(eqn_1.get_op() == '-' ? eqn_1.get_rs()*-1 / eqn_1.get_ls_const()[0] : eqn_1.get_rs() / eqn_1.get_ls_const()[0], eqn_1.get_op() == '-' ? eqn_1.get_ls_const()[0] / eqn_1.get_ls_const()[1] : (eqn_1.get_ls_const()[1] * -1) / eqn_1.get_ls_const()[0], var_2);
-		}
-	}
-	if (eqn_2.get_ls_const()[1] && eqn_2.get_ls_const()[0] == 0 && eqn_1.get_ls_const()[0] && eqn_1.get_ls_const()[1]) {
-		//(Ax+By=C)(0x+By=C)
-		if (eqn_2.get_ls_var()[0] == eqn_1.get_ls_var()[0]) {
-			var_1 = solve_y();
-			var_2 = eqn_1.get_rs() / eqn_1.get_ls_const()[1];
-		}
-		//(Ax+By=C)(0y+Bx=C)
-		else {
-			var_1 = eqn_1.get_rs() / eqn_1.get_ls_const()[1];
-			var_2 = solve_x(eqn_1.get_op() == '-' ? eqn_1.get_rs()*-1 / eqn_1.get_ls_const()[0] : eqn_1.get_rs() / eqn_1.get_ls_const()[0], eqn_1.get_op() == '-' ? eqn_1.get_ls_const()[0] / eqn_1.get_ls_const()[1] : (eqn_1.get_ls_const()[1] * -1) / eqn_1.get_ls_const()[0], var_2);
-		}
-	}
-	//(0x+By=C)(Ax+0y=X)
-	if (eqn_1.get_ls_const()[0] == 0 && eqn_1.get_ls_const()[1] && eqn_2.get_ls_const()[0] && eqn_2.get_ls_const()[1] == 0 && eqn_1.get_ls_var()[0] == eqn_2.get_ls_var()[0]) {
-		var_2 = eqn_1.get_rs() / eqn_1.get_ls_const()[1];
-		var_1 = eqn_2.get_rs() / eqn_2.get_ls_const()[0];
-	}
-	// (0x+By=C)(0y+Ax=C)
-	if (eqn_1.get_ls_const()[0] == 0 && eqn_1.get_ls_const()[1] && eqn_2.get_ls_const()[1] && eqn_2.get_ls_const()[0] == 0 && eqn_1.get_ls_var()[0] != eqn_2.get_ls_var()[0]) {
-		var_2 = eqn_1.get_rs() / eqn_1.get_ls_const()[1];
-		var_1 = eqn_2.get_rs() / eqn_2.get_ls_const()[1];
-	}
-	//(Ax+0y=C)(0x+By=C)
-	if (eqn_1.get_ls_const()[1] == 0 && eqn_1.get_ls_const()[0] && eqn_2.get_ls_const()[1] && eqn_2.get_ls_const()[0] == 0 && eqn_1.get_ls_var()[0] == eqn_2.get_ls_var()[0]) {
-		var_2 = eqn_2.get_rs() / eqn_2.get_ls_const()[1];
-		var_1 = eqn_1.get_rs() / eqn_1.get_ls_const()[0];
-	}
-	//(Ax+By=C)(Ax+By=C)
-	if (eqn_1.get_ls_const()[0] && eqn_1.get_ls_const()[1] && eqn_2.get_ls_const()[0] && eqn_2.get_ls_const()[1]) {
-		try {
-			var_2 = solve_y();
-			var_1 = solve_x(eqn_1.get_op() == '-' ? eqn_1.get_rs()*-1 / eqn_1.get_ls_const()[0] : eqn_1.get_rs() / eqn_1.get_ls_const()[0], eqn_1.get_op() == '-' ? eqn_1.get_ls_const()[0] / eqn_1.get_ls_const()[1] : (eqn_1.get_ls_const()[1] * -1) / eqn_1.get_ls_const()[0], var_2);
-		}
-		catch (boost::exception_detail::clone_impl<boost::exception_detail::error_info_injector<boost::bad_rational>>& e) {
-			std::cout << "Invalid equation found - " << e.what() << std::endl;
-		}
-		catch (std::domain_error) {
-			throw;
-		}
-	}
+	boost::rational<int> var_1,var_2;
+	//solve by elimination
+	var_2 = solve_var_2(eqn_1, eqn_2);
+	var_1 = solve_var_1(eqn_1, eqn_2);
 	std::string result = std::string(1,eqn_1.get_ls_var()[0]) + " = " + rational_to_string(var_1) + " " + eqn_1.get_ls_var()[1] + " = " + rational_to_string(var_2);
 	return result;
 }

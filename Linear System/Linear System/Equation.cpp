@@ -52,6 +52,11 @@ boost::rational<int> make_rational(std::string str) {
 }
 
 Equation::Equation(std::string str) {
+	//remove characters other than those allowed
+	for (auto& _char : str)
+		if ((_char < '0' || _char > '9') && (_char < 'a' || _char > 'z') && _char != ' '
+			&& _char != ')' && _char != '(' && _char != '+' && _char != '-' && _char != '=' && _char != '/')
+			throw std::domain_error("Inalid Character: " + _char);
 	//remove all spaces
 	str.erase(remove_if(str.begin(), str.end(), isspace), str.end());
 	//get ls of eqn
@@ -81,6 +86,11 @@ Equation::Equation(std::string str) {
 	else
 		throw std::domain_error("Equation must have '='");
 	//check for double zero coef
+	if (ls_const[0] == 0 && ls_const[1] == 0)
+		throw std::domain_error("Invalid Equation");
+	// check for double var_name
+	if (ls_var[0] == ls_var[1])
+		throw std::domain_error("2 variables are required.");
 	//check for --
 	if (op == '-' && ls_const[1] < 0) {
 		op = '+';
