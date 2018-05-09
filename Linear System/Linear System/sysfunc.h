@@ -86,5 +86,10 @@ inline void get_user_system(vector<System> &systems) {
 	system("cls");
 	cout << "Enter a linear system containing two equations in the form Ax + By = C" << endl << "Enter equation 2: " << endl;
 	getline(cin, eqn_2);
-	systems.push_back(System(eqn_1, eqn_2));
+	try {
+		systems.push_back(System(eqn_1, eqn_2));
+	}
+	catch (std::domain_error& e) {
+		std::cout << e.what() << std::endl;
+	}
 }

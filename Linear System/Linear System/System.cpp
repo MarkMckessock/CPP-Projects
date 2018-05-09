@@ -18,10 +18,7 @@ System::System(std::string _eqn_1, std::string _eqn_2){
 			eqn_1.get_rs() != eqn_2.get_rs())
 			throw(std::domain_error("Unsolvable system"));
 	}
-	catch (std::invalid_argument& e) {
-		throw;
-	}
-	catch (std::domain_error) {
+	catch (std::domain_error& e) {
 		throw;
 	}
 }
