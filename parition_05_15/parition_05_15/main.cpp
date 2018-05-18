@@ -9,14 +9,10 @@ int rand_int(int low, int high) {
 	return distr(eng);
 }
 
-void partition(std::vector<int>& vals, int low, int high) {
+int partition(std::vector<int>& vals, int low, int high) {
 	int pivot = vals[low],hole = low;	
 	bool increment = true;
-	std::cout << "Partitioning based on key of: " << pivot << std::endl;
 	while (high >= low) {
-		//for (int i = 0; i < vals.size(); i++)
-		//	std::cout << vals[i] << " ";
-		//std::cout << std::endl;
  		if (increment) {
 			if (vals[high] <= pivot) {
 				vals[hole] = vals[high];
@@ -39,6 +35,15 @@ void partition(std::vector<int>& vals, int low, int high) {
 				low++;
 		}
 	}
+	return hole;
+}
+
+void quick_sort(std::vector<int>& vals, int low, int high) {
+	if (low < high) {
+		int pivot = partition(vals, low, high);
+		quick_sort(vals, low, pivot - 1);
+		quick_sort(vals, pivot + 1, high);
+	}
 }
 
 int main() {
@@ -46,7 +51,11 @@ int main() {
 	for (int i = 0; i < 20; i++)
 		vals.push_back(rand_int(-10, 50));
 
-	partition(vals, 0, 19);
+	for (auto num : vals)
+		std::cout << num << " ";
+	std::cout << std::endl;
+
+	quick_sort(vals, 0, 19);
 	for (auto num : vals)
 		std::cout << num << " ";
 	system("pause");
