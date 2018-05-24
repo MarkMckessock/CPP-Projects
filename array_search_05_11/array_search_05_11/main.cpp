@@ -37,7 +37,7 @@ int find_key_bin_iterative(std::vector<int> vals,int key) {
 
 int find_key_bin_recursive(std::vector<int>::iterator low, std::vector<int>::iterator high, std::vector<int>& vals,int key) {
 	if (low >= high)
-		return 1;
+		return -1;
 	std::vector<int>::iterator mid = low;
 	std::advance(mid, std::distance(low, high) / 2);
 	if (*mid == key)
