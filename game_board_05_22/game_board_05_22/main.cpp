@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 #include <vector>
 #include <array>
 
@@ -31,13 +28,12 @@ public:
 
 class board{
 public:
+	std::vector<std::vector<cell>> grid;
+
 	board(int rows,int columns) {
-		grid = new std::array<std::array<cell, columns>, rows>;
+		grid.resize(columns, std::vector<int>(rows));
 	};
-	~board(){
-		delete grid;
-	}
-	std::<std::vector<cell>> grid;
+
 };
 
 int rb(int min, int max) {
