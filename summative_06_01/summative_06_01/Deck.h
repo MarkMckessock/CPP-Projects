@@ -1,11 +1,17 @@
-#pragma once
-#include "enum_types.h"
+#include "Rank.h"
+#include "Color.h"
 #include <vector>
 #include "Card.h"
+#include "Hand.h"
+
+#ifndef DECK
+#define DECK
+
 class Deck{
 public:
 	Deck();
 	std::vector<Card> cards;
-	std::vector<Card> deal();
+	Hand deal();
 };
 
+#endif

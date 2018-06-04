@@ -1,3 +1,3 @@
 #include "Card.h"
 
-Card::Card(Color _color,Rank _rank):color(_color),rank(_rank){}
+Card::Card(Color::Color _color,Rank::Rank _rank):color(_color),rank(_rank){}

@@ -1,9 +1,14 @@
-#pragma once
-#include "enum_types.h"
+#include "Rank.h"
+#include "Color.h"
+
+#ifndef CARD
+#define CARD
+ 
 class Card{
 public:
-	Card(Color _color, Rank _rank);
-	Color color;
-	Rank rank;
+	Card(Color::Color _color, Rank::Rank _rank);
+	Color::Color color;
+	Rank::Rank rank;
 };
 
+#endif
