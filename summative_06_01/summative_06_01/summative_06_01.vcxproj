@@ -134,6 +134,7 @@
     <ClInclude Include="rand.h" />
     <ClInclude Include="Rank.h" />
     <ClInclude Include="Hands.h" />
+    <ClInclude Include="split.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Color.h" />
