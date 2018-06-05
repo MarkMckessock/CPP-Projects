@@ -6,6 +6,7 @@
 #define SPLIT
 
 inline bool split (std::string& s, char delimiter, std::vector<std::string> &split_target){
+	/*Splits a string into a vector of stringss if possible, otherwise returns false.*/
 	std::vector<std::string> splits;
 	std::string split = "";
 	unsigned int i = 0;

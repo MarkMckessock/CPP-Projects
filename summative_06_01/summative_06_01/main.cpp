@@ -18,7 +18,7 @@ void hands_to_file(std::vector<Hand>& hands,std::string path,bool sorted = false
 		file << "Generated " << hands.size() << " hands." << std::endl;
 	}
 	file << "----------------------------------------------------" << std::endl << std::endl;
-	for (int i = 1; i <= hands.size();i++) {
+	for (unsigned int i = 1; i <= hands.size();i++) {
 		file << "Hand #" << i << ":" << std::endl;
 		hands[i-1].output(file);
 		file << Hands::lookup[hands[i - 1].hand_type] << std::endl;
@@ -28,6 +28,7 @@ void hands_to_file(std::vector<Hand>& hands,std::string path,bool sorted = false
 }
 
 void sort_hands(std::vector<Hand>& hands) {
+	/*Sort hands based on their relative value/rarity. */
 	for (unsigned int i = 0; i<hands.size() - 1; i++)
 		for (unsigned int j = 0; j < hands.size() - i - 1; j++) {
 			if (hands[j].hand_type > hands[j + 1].hand_type) {
@@ -71,13 +72,16 @@ void random_deal_hands() {
 }
 
 void choose_hands() {
+	system("cls");
 	std::cout << "Please choose a hand to generate:" << std::endl;
 	std::cout << "---------------------------------" << std::endl;
 	for (int i = 1; i < Hands::LAST; i++)
 		std::cout << "(" << i << ") - " << Hands::lookup[static_cast<Hands::Hands>(i-1)] << std::endl;
+
 	std::cout << std::endl;
 	std::string choice_s;
 	std::cin >> choice_s;
+
 	try {
 		int choice_i = std::stoi(choice_s);
 		if (choice_i < Hands::LAST) {
