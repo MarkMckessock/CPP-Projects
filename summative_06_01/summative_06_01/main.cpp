@@ -21,7 +21,7 @@ void hands_to_file(std::vector<Hand>& hands,std::string path,bool sorted = false
 	for (unsigned int i = 1; i <= hands.size();i++) {
 		file << "Hand #" << i << ":" << std::endl;
 		hands[i-1].output(file);
-		file << Hands::lookup[hands[i - 1].hand_type] << std::endl;
+		file << "Identified as: " << Hands::lookup[hands[i - 1].hand_type] << std::endl;
 		file << std::endl;
 	}
 	file.close();
@@ -56,12 +56,14 @@ void random_deal_hands() {
 		}
 		catch (std::domain_error& e) {
 			std::cout << e.what() << std::endl;
+			system("pause");
 			return;
 		}
 		std::string path = "C:/Users/Mark/Documents/hands.txt";
 		hands_to_file(hands, path);
 		sort_hands(hands);
 		hands_to_file(hands, path, true);
+		system("cls");
 		std::cout << "Printed " << hand_count_i << " hands to \"" << path << "\"." << std::endl;
 		system("pause");
 	}
@@ -81,7 +83,7 @@ void choose_hands() {
 	std::cout << std::endl;
 	std::string choice_s;
 	std::cin >> choice_s;
-
+	system("cls");
 	try {
 		int choice_i = std::stoi(choice_s);
 		if (choice_i < Hands::LAST) {
