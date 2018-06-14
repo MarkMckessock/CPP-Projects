@@ -14,7 +14,7 @@ void Matrix::parse(std::string path) {
 	}
 	std::vector<std::vector<std::string>> items;
 	for (auto& line : lines)
-		items.push_back(split(line, ' '));
+		items.push_back(split(line, '\t'));
 
 	for (unsigned int i = 1; i < items.size(); i++) {
 		for (unsigned int j = 1; j < items[0].size(); j++)

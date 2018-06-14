@@ -5,8 +5,8 @@ int main() {
 	Matrix products;
 	Matrix payscale;
 
-	products.parse("C:/Users/Mark/Documents/product_sale.txt");
-	payscale.parse("C:/Users/Mark/Documents/payscales.txt");
+	products.parse("C:/Users/Mark/Documents/sales_2.txt");
+	payscale.parse("C:/Users/Mark/Documents/payscale_2.txt");
 
 	products.output();
 	payscale.output();
